@@ -180,8 +180,8 @@
     const cy = cytoscape({
       container: document.getElementById('cy'),
       elements: { nodes: nodes, edges: edges },
-      // Bloquear zoom para mantener la escala fija
-      userZoomingEnabled: false,
+      // Permitir zoom para que el usuario ajuste el tamaño según sus preferencias
+      userZoomingEnabled: true,
       // Panning se activará más adelante dependiendo del dispositivo
       userPanningEnabled: false,
       boxSelectionEnabled: false,
@@ -234,8 +234,8 @@
     // Bloquear los nodos para que no se puedan arrastrar ni mover
     cy.nodes().ungrabify();
 
-    // Permitir desplazamiento del grafo solo en dispositivos móviles para que el usuario pueda moverse horizontalmente
-    cy.userPanningEnabled(isMobile);
+    // Permitir desplazamiento del grafo en todos los dispositivos para que se puedan descubrir columnas fuera de la vista inicial
+    cy.userPanningEnabled(true);
 
     function updateStatuses() {
       let completedCount = 0;
@@ -290,18 +290,7 @@
       if (evt.target.hasClass('available') || evt.target.hasClass('completed')) {
         courseState[id] = !courseState[id];
         updateStatuses();
-        // Ajustar vista después de cambiar el estado de una materia
-        if (isMobile) {
-          // En móviles ajustamos sólo la escala horizontal para mantener legibilidad
-          const bbox = cy.elements().boundingBox();
-          const containerWidth = cy.width();
-          const scale = containerWidth / (bbox.w + 40);
-          const level = scale * 1.5;
-          cy.zoom({ level, position: { x: bbox.x1, y: 0 } });
-          cy.pan({ x: 10, y: 0 });
-        } else {
-          cy.fit(cy.elements(), 60);
-        }
+        // Ya no reajustamos la cámara al hacer clic, para evitar saltos incómodos
       }
     });
   </script>
