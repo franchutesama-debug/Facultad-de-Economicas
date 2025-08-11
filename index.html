@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Diagrama de correlatividades – Carrera de Actuario (optativas, fijo)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.24.1/cytoscape.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fafafa;
+    }
+    h2 {
+      margin: 16px 0 8px 0;
+      text-align: center;
+      font-size: 24px;
+    }
+    #progress-container {
+      width: 85%;
+      margin: 0 auto 10px auto;
+      height: 22px;
+      background: #e0e0e0;
+      border-radius: 10px;
+      position: relative;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #4caf50;
+      border-radius: 10px;
+    }
+    #progress-text {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 13px;
+      color: #333;
+      font-weight: bold;
+    }
+    #legend {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding-bottom: 10px;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+    }
+    .legend-color {
+      width: 18px;
+      height: 18px;
+      margin-right: 6px;
+      border: 1px solid #333;
+    }
+    #cy {
+      width: 100%;
+      height: calc(100vh - 160px);
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h2>Plan de Estudios – Diagrama con Optativas (fijo)</h2>
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+    <span id="progress-text">0% completado</span>
+  </div>
+  <div id="legend">
+    <div class="legend-item"><span class="legend-color" style="background-color:#4caf50"></span>Materia completada</div>
+    <div class="legend-item"><span class="legend-color" style="background-color:#2196f3"></span>Disponible</div>
+    <div class="legend-item"><span class="legend-color" style="background-color:#9e9e9e"></span>Bloqueada</div>
+  </div>
+  <div id="cy"></div>
+  <script>
+    const nodeWidth = 200;
+    const nodeHeight = 80;
+    const xSpacing = 280;
+    const ySpacing = 100;
+
+    const courses = [
+      { id: '245', name: 'Álgebra', prerequisites: [] },
+      { id: '241', name: 'Análisis matemático 1', prerequisites: [] },
+      { id: '242', name: 'Economía', prerequisites: [] },
+      { id: '246', name: 'Historia económica y social argentina', prerequisites: [] },
+      { id: '255', name: 'Análisis contable', prerequisites: [] },
+      { id: '256', name: 'Inst. de Gobierno y Economía Política', prerequisites: [] },
+      { id: '540', name: 'Análisis estadístico', prerequisites: ['245','241','242','246','255','256'] },
+      { id: '542', name: 'Matemática aplicada I', prerequisites: ['245','241','242','246','255','256'] },
+      { id: '262', name: 'Macroeconomía', prerequisites: ['245','241','242','246','255','256'] },
+      { id: '274', name: 'Sistemas administrativos', prerequisites: ['245','241','242','246','255','256'] },
+      { id: '462', name: 'Derecho empresarial', prerequisites: ['245','241','242','246','255','256'] },
+      { id: '602', name: 'Análisis estadístico II', prerequisites: ['540','542'] },
+      { id: '544', name: 'Matemática aplicada II', prerequisites: ['542'] },
+      { id: '291', name: 'Microeconomía p/economistas', prerequisites: ['542'] },
+      { id: '279', name: 'Administración financiera', prerequisites: ['601'] },
+      { id: '603', name: 'Derecho financiero, seguros y seguridad social', prerequisites: ['462'] },
+      { id: '746', name: 'Computación científica actuarial', prerequisites: ['540','542'] },
+      { id: '601', name: 'Matemática financiera y actuarial', prerequisites: ['540','542'] },
+      { id: '752', name: 'Análisis numérico', prerequisites: ['544'] },
+      { id: '548', name: 'Dinero y bancos', prerequisites: ['279','602'] },
+      { id: '751', name: 'Estadística actuarial', prerequisites: ['544','602'] },
+      { id: '753', name: 'Biometría actuarial', prerequisites: ['601','751','752'] },
+      { id: '754', name: 'Teoría actuarial de los seguros personales (Act.1)', prerequisites: ['753'] },
+      { id: '755', name: 'Teoría actuarial de los seguros patrimoniales (Act.2)', prerequisites: ['601','751','752'] },
+      { id: '756', name: 'Teoría actuarial de los fondos y plan de jub., pensión y salud (Act.4)', prerequisites: ['754'] },
+      { id: '757', name: 'Teoría del equilibrio actuarial (Act.3)', prerequisites: ['754','755'] },
+      { id: '758', name: 'Bases actuariales de las inversiones y financiaciones (Act.5)', prerequisites: ['601','751'] },
+      { id: '717', name: 'Modelos y proyecciones actuariales', prerequisites: ['757','758','746'] },
+      { id: '728', name: 'Práctica profesional del actuario', prerequisites: ['754','755','756'] },
+      { id: 'OPT1', name: 'Optativa 1', prerequisites: [] },
+      { id: 'OPT2', name: 'Optativa 2', prerequisites: [] }
+    ];
+
+    const courseState = {};
+    courses.forEach(c => { courseState[c.id] = false; });
+
+    const levelMap = {};
+    const courseById = {};
+    courses.forEach(c => { courseById[c.id] = c; });
+
+    function computeLevel(id) {
+      if (levelMap[id] !== undefined) return levelMap[id];
+      const course = courseById[id];
+      if (!course || course.prerequisites.length === 0) {
+        levelMap[id] = 0;
+      } else {
+        const levels = course.prerequisites.map(pr => computeLevel(pr));
+        levelMap[id] = Math.max(...levels) + 1;
+      }
+      return levelMap[id];
+    }
+    courses.forEach(c => { c._level = computeLevel(c.id); });
+
+    const grouped = {};
+    courses.forEach(c => {
+      if (!grouped[c._level]) grouped[c._level] = [];
+      grouped[c._level].push(c);
+    });
+    Object.keys(grouped).forEach(level => {
+      grouped[level].sort((a,b) => a.id.localeCompare(b.id));
+    });
+
+    Object.keys(grouped).forEach(level => {
+      const group = grouped[level];
+      group.forEach((course, index) => {
+        course.pos = { x: parseInt(level), y: index };
+      });
+    });
+
+    const nodes = courses.map(c => {
+      return {
+        data: {
+          id: c.id,
+          label: c.id + '\n' + c.name
+        },
+        position: {
+          x: c.pos.x * xSpacing + 100,
+          y: c.pos.y * ySpacing + 60
+        }
+      };
+    });
+
+    const edges = [];
+
+    const cy = cytoscape({
+      container: document.getElementById('cy'),
+      elements: { nodes: nodes, edges: edges },
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'shape': 'round-rectangle',
+            'width': nodeWidth,
+            'height': nodeHeight,
+            'background-color': '#ffffff',
+            'border-color': '#333333',
+            'border-width': 2,
+            'label': 'data(label)',
+            'text-wrap': 'wrap',
+            'text-max-width': nodeWidth - 20,
+            'text-valign': 'center',
+            'color': '#333333',
+            'font-size': 12
+          }
+        },
+        {
+          selector: '.completed',
+          style: {
+            'background-color': '#4caf50',
+            'border-color': '#388e3c',
+            'color': '#ffffff'
+          }
+        },
+        {
+          selector: '.available',
+          style: {
+            'background-color': '#2196f3',
+            'border-color': '#1976d2',
+            'color': '#ffffff'
+          }
+        },
+        {
+          selector: '.locked',
+          style: {
+            'background-color': '#9e9e9e',
+            'border-color': '#616161',
+            'color': '#ffffff'
+          }
+        }
+      ],
+      layout: { name: 'preset' }
+    });
+
+    // Bloquear los nodos para que no se puedan arrastrar ni mover
+    cy.nodes().ungrabify();
+
+    function updateStatuses() {
+      let completedCount = 0;
+      courses.forEach(course => {
+        const node = cy.getElementById(course.id);
+        node.removeClass('completed');
+        node.removeClass('available');
+        node.removeClass('locked');
+        if (courseState[course.id]) {
+          node.addClass('completed');
+          completedCount++;
+        } else {
+          const allDone = course.prerequisites.every(pr => courseState[pr]);
+          if (allDone) {
+            node.addClass('available');
+          } else {
+            node.addClass('locked');
+          }
+        }
+      });
+      const percentage = Math.round((completedCount / courses.length) * 100);
+      document.getElementById('progress-bar').style.width = percentage + '%';
+      document.getElementById('progress-text').textContent = percentage + '% completado';
+    }
+
+    updateStatuses();
+
+    cy.on('tap', 'node', function(evt) {
+      const id = evt.target.id();
+      if (evt.target.hasClass('available') || evt.target.hasClass('completed')) {
+        courseState[id] = !courseState[id];
+        updateStatuses();
+      }
+    });
+  </script>
+</body>
+</html>
