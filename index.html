@@ -67,15 +67,25 @@
   </style>
 </head>
 <body>
-  <h2>Plan de Estudios – Diagrama con Optativas (fijo)</h2>
+  <!-- Título simplificado -->
+  <h2>Actuario</h2>
   <div id="progress-container">
     <div id="progress-bar"></div>
     <span id="progress-text">0% completado</span>
   </div>
   <div id="legend">
-    <div class="legend-item"><span class="legend-color" style="background-color:#4caf50"></span>Materia completada</div>
-    <div class="legend-item"><span class="legend-color" style="background-color:#2196f3"></span>Disponible</div>
-    <div class="legend-item"><span class="legend-color" style="background-color:#9e9e9e"></span>Bloqueada</div>
+    <div class="legend-item">
+      <span class="legend-color" style="background-color:#4caf50"></span>
+      Aprobada
+    </div>
+    <div class="legend-item">
+      <span class="legend-color" style="background-color:#2196f3"></span>
+      Cumple requisitos
+    </div>
+    <div class="legend-item">
+      <span class="legend-color" style="background-color:#9e9e9e"></span>
+      No cumple requisitos
+    </div>
   </div>
   <div id="cy"></div>
   <script>
@@ -160,17 +170,15 @@
     });
 
     const nodes = courses.map(c => {
-      // En móviles, invertimos los ejes para que las materias se dispongan verticalmente
-      const posX = isMobile ? c.pos.y : c.pos.x;
-      const posY = isMobile ? c.pos.x : c.pos.y;
+      // Utilizamos el mismo sistema de coordenadas tanto en escritorio como en móvil (horizontal)
       return {
         data: {
           id: c.id,
           label: c.id + '\n' + c.name
         },
         position: {
-          x: posX * xSpacing + 100,
-          y: posY * ySpacing + 60
+          x: c.pos.x * xSpacing + 100,
+          y: c.pos.y * ySpacing + 60
         }
       };
     });
@@ -263,27 +271,25 @@
 
     updateStatuses();
 
-    // Ajustar el diagrama según el dispositivo: en móviles ajustamos solo al ancho, dejando que la altura se despliegue y se pueda hacer scroll.
-    if (isMobile) {
-      const fitHorizontally = () => {
-        const bbox = cy.elements().boundingBox();
-        const containerWidth = cy.width();
-        // Calculamos una escala que ajuste el ancho y dejamos margen adicional para aumentar el tamaño
-        const scale = containerWidth / (bbox.w + 40);
-        const level = scale * 1.5;
-        cy.zoom({ level, position: { x: bbox.x1, y: 0 } });
-        // Alineamos ligeramente hacia la izquierda
-        cy.pan({ x: 10, y: 0 });
-      };
-      fitHorizontally();
-      window.addEventListener('resize', fitHorizontally);
-    } else {
-      const fitDesktop = () => {
-        cy.fit(cy.elements(), 60);
-      };
-      fitDesktop();
-      window.addEventListener('resize', fitDesktop);
+    // Ajustar el diagrama según el dispositivo.
+    // En todos los dispositivos utilizamos cy.fit() para calcular un encuadre inicial.
+    // Para móviles aplicamos un zoom adicional para mejorar la legibilidad,
+    // pero el usuario siempre puede acercar o alejar con gestos de zoom.
+    function applyInitialView() {
+      // Encajamos todos los elementos con un poco de margen
+      cy.fit(cy.elements(), 60);
+      if (isMobile) {
+        // Aumentamos la escala para que el grafo se vea más grande en móviles
+        const factor = 1.8;
+        cy.zoom({ level: cy.zoom() * factor, position: { x: 0, y: 0 } });
+        // Desplazamos ligeramente el grafo hacia la derecha para que el primer nivel no quede demasiado pegado al borde
+        cy.pan({ x: 20, y: 0 });
+      }
     }
+
+    applyInitialView();
+    // Volvemos a calcular la vista cuando la ventana cambia de tamaño
+    window.addEventListener('resize', applyInitialView);
 
     cy.on('tap', 'node', function(evt) {
       const id = evt.target.id();
