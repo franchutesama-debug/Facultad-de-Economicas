@@ -2,6 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <!-- Habilitar escala responsiva para dispositivos móviles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0" />
   <title>Diagrama de correlatividades – Carrera de Actuario (optativas, fijo)</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.24.1/cytoscape.min.js"></script>
   <style>
@@ -77,10 +79,15 @@
   </div>
   <div id="cy"></div>
   <script>
-    const nodeWidth = 200;
-    const nodeHeight = 80;
-    const xSpacing = 280;
-    const ySpacing = 100;
+    // Detectamos si la pantalla es estrecha (dispositivo móvil) y ajustamos las dimensiones
+    const isMobile = window.innerWidth <= 600;
+    const nodeFontSize = isMobile ? 14 : 12;
+    // Aumentamos el tamaño de los nodos en móviles para mejorar la legibilidad
+    const nodeWidth = isMobile ? 180 : 200;
+    const nodeHeight = isMobile ? 80 : 80;
+    // Para dispositivos móviles, usamos un espaciado diferente y orientamos el gráfico de arriba hacia abajo
+    const xSpacing = isMobile ? 200 : 280;
+    const ySpacing = isMobile ? 120 : 100;
 
     const courses = [
       { id: '245', name: 'Álgebra', prerequisites: [] },
@@ -153,14 +160,17 @@
     });
 
     const nodes = courses.map(c => {
+      // En móviles, invertimos los ejes para que las materias se dispongan verticalmente
+      const posX = isMobile ? c.pos.y : c.pos.x;
+      const posY = isMobile ? c.pos.x : c.pos.y;
       return {
         data: {
           id: c.id,
           label: c.id + '\n' + c.name
         },
         position: {
-          x: c.pos.x * xSpacing + 100,
-          y: c.pos.y * ySpacing + 60
+          x: posX * xSpacing + 100,
+          y: posY * ySpacing + 60
         }
       };
     });
@@ -170,6 +180,11 @@
     const cy = cytoscape({
       container: document.getElementById('cy'),
       elements: { nodes: nodes, edges: edges },
+      // Bloquear zoom para mantener la escala fija
+      userZoomingEnabled: false,
+      // Panning se activará más adelante dependiendo del dispositivo
+      userPanningEnabled: false,
+      boxSelectionEnabled: false,
       style: [
         {
           selector: 'node',
@@ -185,7 +200,7 @@
             'text-max-width': nodeWidth - 20,
             'text-valign': 'center',
             'color': '#333333',
-            'font-size': 12
+            'font-size': nodeFontSize
           }
         },
         {
@@ -219,6 +234,9 @@
     // Bloquear los nodos para que no se puedan arrastrar ni mover
     cy.nodes().ungrabify();
 
+    // Permitir desplazamiento del grafo solo en dispositivos móviles para que el usuario pueda moverse horizontalmente
+    cy.userPanningEnabled(isMobile);
+
     function updateStatuses() {
       let completedCount = 0;
       courses.forEach(course => {
@@ -245,11 +263,45 @@
 
     updateStatuses();
 
+    // Ajustar el diagrama según el dispositivo: en móviles ajustamos solo al ancho, dejando que la altura se despliegue y se pueda hacer scroll.
+    if (isMobile) {
+      const fitHorizontally = () => {
+        const bbox = cy.elements().boundingBox();
+        const containerWidth = cy.width();
+        // Calculamos una escala que ajuste el ancho y dejamos margen adicional para aumentar el tamaño
+        const scale = containerWidth / (bbox.w + 40);
+        const level = scale * 1.5;
+        cy.zoom({ level, position: { x: bbox.x1, y: 0 } });
+        // Alineamos ligeramente hacia la izquierda
+        cy.pan({ x: 10, y: 0 });
+      };
+      fitHorizontally();
+      window.addEventListener('resize', fitHorizontally);
+    } else {
+      const fitDesktop = () => {
+        cy.fit(cy.elements(), 60);
+      };
+      fitDesktop();
+      window.addEventListener('resize', fitDesktop);
+    }
+
     cy.on('tap', 'node', function(evt) {
       const id = evt.target.id();
       if (evt.target.hasClass('available') || evt.target.hasClass('completed')) {
         courseState[id] = !courseState[id];
         updateStatuses();
+        // Ajustar vista después de cambiar el estado de una materia
+        if (isMobile) {
+          // En móviles ajustamos sólo la escala horizontal para mantener legibilidad
+          const bbox = cy.elements().boundingBox();
+          const containerWidth = cy.width();
+          const scale = containerWidth / (bbox.w + 40);
+          const level = scale * 1.5;
+          cy.zoom({ level, position: { x: bbox.x1, y: 0 } });
+          cy.pan({ x: 10, y: 0 });
+        } else {
+          cy.fit(cy.elements(), 60);
+        }
       }
     });
   </script>
