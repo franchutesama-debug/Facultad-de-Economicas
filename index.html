@@ -437,8 +437,10 @@ var CAREERS = {
 var CBC_WEIGHT=6, isMob=window.innerWidth<=768;
 var NW=isMob?148:186, NH=isMob?60:68, XS=isMob?170:210, YS=isMob?76:84;
 var NFZ=isMob?10:11, BFZ=isMob?9:10;
-var currentCareer=null, cy=null, modalId=null;
+var currentCareer=null, currentLegajo='invitado', cy=null, modalId=null;
 var courseState={}, descMap={};
+function stateKey(career){return 'state_'+currentLegajo+'_'+(career||currentCareer);}
+function customsKey(){return 'customs_'+currentLegajo+'_'+currentCareer;}
 
 function lsGet(k){try{return JSON.parse(localStorage.getItem('fc_'+k)||'null');}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem('fc_'+k,JSON.stringify(v));}catch(e){}}
@@ -551,7 +553,7 @@ function calcAvg(){
   CAREERS[currentCareer].courses.forEach(function(c){addHist(courseState[c.id]);});
   var edata=ELECTIVAS[currentCareer];
   if(edata)edata.list.forEach(function(e){addHist(courseState[e.id]);});
-  (lsGet('customs_'+currentCareer)||[]).forEach(function(e){addHist(courseState[e.id]);});
+  (lsGet(customsKey())||[]).forEach(function(e){addHist(courseState[e.id]);});
   return gCnt>0?(gSum/gCnt).toFixed(2):'-';
 }
 
@@ -574,7 +576,7 @@ function updateAll(){
   var cbcDone=cbcCourses.filter(function(c){return courseState[c.id]&&courseState[c.id].approved;}).length;
   var edata=ELECTIVAS[currentCareer],reqE=edata?edata.required:0,doneE=0;
   if(edata)edata.list.forEach(function(e){if(courseState[e.id]&&courseState[e.id].approved)doneE++;});
-  (lsGet('customs_'+currentCareer)||[]).forEach(function(e){if(courseState[e.id]&&courseState[e.id].approved)doneE++;});
+  (lsGet(customsKey())||[]).forEach(function(e){if(courseState[e.id]&&courseState[e.id].approved)doneE++;});
   var doneC=courses.filter(function(c){return courseState[c.id]&&courseState[c.id].approved;}).length;
   var total=courses.length+CBC_WEIGHT+reqE;
   var done=doneC+cbcDone+Math.min(doneE,reqE);
@@ -598,13 +600,15 @@ function updateAll(){
 // ============================================================
 function selectCareer(key){
   var leg=document.getElementById('legajo-input').value.trim();
-  if(leg)lsSet('legajo',leg);
+  if(leg){lsSet('legajo',leg);currentLegajo=leg;}
+  else{var saved=lsGet('legajo');currentLegajo=saved||'invitado';}
   currentCareer=key;lsSet('career',key);
-  courseState=lsGet('state_'+key)||{};
+  courseState=lsGet(stateKey(key))||{};
   document.getElementById('selector').style.display='none';
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('career-lbl').textContent=CAREERS[key].label;
-  var l=lsGet('legajo');document.getElementById('user-badge').textContent=l?'Legajo: '+l:'';
+  var l=currentLegajo!=='invitado'?currentLegajo:null;
+  document.getElementById('user-badge').textContent=l?'Legajo: '+l:'';
   descMap=buildDescMap(CAREERS[key].courses);
   initCy(key);
 }
@@ -645,7 +649,7 @@ function saveCBC(){
     if(grade!=null&&grade!==st.grade)hist.push({g:grade,pass:approved&&grade>=4});
     courseState[c.id]={approved:approved&&grade!=null&&+grade>=4,grade:(approved&&grade!=null&&+grade>=4)?grade:null,history:hist};
   });
-  lsSet('state_'+currentCareer,courseState);closeCBCModal();updateAll();
+  lsSet(stateKey(),courseState);closeCBCModal();updateAll();
 }
 function closeCBCModal(){document.getElementById('cbc-overlay').classList.add('hidden');}
 document.getElementById('cbc-overlay').addEventListener('click',function(e){if(e.target.id==='cbc-overlay')closeCBCModal();});
@@ -703,14 +707,14 @@ function doRegistrar(pass){
   var st=courseState[modalId]||{approved:false,grade:null,history:[]};
   var hist=(st.history||[]).slice();hist.push({g:raw,pass:pass});
   courseState[modalId]={approved:pass,grade:pass?raw:null,history:hist};
-  lsSet('state_'+currentCareer,courseState);closeModal();updateAll();
+  lsSet(stateKey(),courseState);closeModal();updateAll();
 }
 function doDeleteLast(){
   if(!modalId||!currentCareer)return;
   var st=courseState[modalId]||{};var hist=(st.history||[]).slice();if(!hist.length)return;
   hist.pop();var newApp=hist.length>0?hist[hist.length-1].pass:false;
   courseState[modalId]={approved:newApp,grade:newApp?hist[hist.length-1].g:null,history:hist};
-  lsSet('state_'+currentCareer,courseState);closeModal();updateAll();
+  lsSet(stateKey(),courseState);closeModal();updateAll();
 }
 function closeModal(){document.getElementById('moverlay').classList.add('hidden');modalId=null;}
 document.getElementById('moverlay').addEventListener('click',function(e){if(e.target.id==='moverlay')closeModal();});
@@ -730,7 +734,7 @@ function renderElectivasList(){
   if(!currentCareer)return;
   var edata=ELECTIVAS[currentCareer];
   var list=document.getElementById('emod-list');list.innerHTML='';
-  var customs=lsGet('customs_'+currentCareer)||[];
+  var customs=lsGet(customsKey())||[];
   edata.list.concat(customs).forEach(function(e){
     var st=courseState[e.id]||{};
     var approved=!!st.approved,hist=st.history||[],avail=electivaAvail(e),hasFailed=!approved&&hist.length>0;
@@ -773,20 +777,20 @@ function doRegistrarE(eid,inp,pass){
   var st=courseState[eid]||{approved:false,grade:null,history:[]};
   var hist=(st.history||[]).slice();hist.push({g:raw,pass:pass});
   courseState[eid]={approved:pass,grade:pass?raw:null,history:hist};
-  lsSet('state_'+currentCareer,courseState);renderElectivasList();updateAll();
+  lsSet(stateKey(),courseState);renderElectivasList();updateAll();
 }
 function doDeleteLastE(eid){
   var st=courseState[eid]||{};var hist=(st.history||[]).slice();if(!hist.length)return;
   hist.pop();var newApp=hist.length>0?hist[hist.length-1].pass:false;
   courseState[eid]={approved:newApp,grade:newApp?hist[hist.length-1].g:null,history:hist};
-  lsSet('state_'+currentCareer,courseState);renderElectivasList();updateAll();
+  lsSet(stateKey(),courseState);renderElectivasList();updateAll();
 }
 function addCustomElectiva(){
   var nm=document.getElementById('emod-custom-name').value.trim();
   if(!nm){alert('Ingresá el nombre de la materia');return;}
-  var customs=lsGet('customs_'+currentCareer)||[];
+  var customs=lsGet(customsKey())||[];
   customs.push({id:'ecustom_'+Date.now(),name:nm,prereqs:[],reqTxt:''});
-  lsSet('customs_'+currentCareer,customs);renderElectivasList();updateAll();
+  lsSet(customsKey(),customs);renderElectivasList();updateAll();
 }
 function closeElectivasModal(){document.getElementById('emod-overlay').classList.add('hidden');}
 document.getElementById('emod-overlay').addEventListener('click',function(e){if(e.target.id==='emod-overlay')closeElectivasModal();});
