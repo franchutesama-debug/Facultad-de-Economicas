@@ -799,22 +799,9 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal(
 // ============================================================
 // FEEDBACK MODAL
 // ============================================================
-function openFeedbackModal(){document.getElementById('fb-overlay').classList.remove('hidden');document.getElementById('fb-name').value='';document.getElementById('fb-msg').value='';document.getElementById('fb-result').textContent='';}
+function openFeedbackModal(){document.getElementById('fb-overlay').classList.remove('hidden');}
 function closeFeedbackModal(){document.getElementById('fb-overlay').classList.add('hidden');}
 document.getElementById('fb-overlay').addEventListener('click',function(e){if(e.target.id==='fb-overlay')closeFeedbackModal();});
-function sendFeedback(e){
-  e.preventDefault();
-  var name=document.getElementById('fb-name').value.trim();
-  var msg=document.getElementById('fb-msg').value.trim();
-  if(!msg){alert('Escribí tu sugerencia antes de enviar.');return;}
-  var subject=encodeURIComponent('Sugerencia – FCE UBA Correlatividades');
-  var body=encodeURIComponent('Nombre: '+(name||'Anónimo')+'\n\nMensaje:\n'+msg);
-  window.open('mailto:franciscosamacoits@gmail.com?subject='+subject+'&body='+body,'_blank');
-  var res=document.getElementById('fb-result');
-  res.style.color='#4ade80';
-  res.textContent='Se abrió tu cliente de mail con el mensaje listo ✓';
-  document.getElementById('fb-send').textContent='Enviado ✓';
-}
 
 // ============================================================
 // STARTUP
@@ -832,22 +819,16 @@ window.addEventListener('load',function(){
 
 <!-- FEEDBACK MODAL -->
 <div id="fb-overlay" class="overlay hidden">
-  <div class="modal-box" style="max-width:360px">
-    <div style="font-size:16px;font-weight:800;color:#c0d0ec;margin-bottom:4px">💬 Sugerencias</div>
-    <div style="font-size:11px;color:#3a5070;margin-bottom:16px">¿Encontraste un error o tenés alguna idea? Mandanos un mensaje.</div>
-    <form id="fb-form" onsubmit="sendFeedback(event)">
-      <div style="margin-bottom:10px">
-        <div style="font-size:11px;color:#2a3850;margin-bottom:5px">Tu nombre (opcional)</div>
-        <input id="fb-name" type="text" placeholder="Nombre..." style="width:100%;padding:9px 12px;border-radius:8px;background:#0d1425;border:1.5px solid #18233a;color:#c0d0ec;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
-      </div>
-      <div style="margin-bottom:12px">
-        <div style="font-size:11px;color:#2a3850;margin-bottom:5px">Sugerencia o error encontrado *</div>
-        <textarea id="fb-msg" rows="4" placeholder="Escribí tu mensaje acá..." style="width:100%;padding:9px 12px;border-radius:8px;background:#0d1425;border:1.5px solid #18233a;color:#c0d0ec;font-size:13px;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box;"></textarea>
-      </div>
-      <button id="fb-send" type="submit" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid #60a5fa;background:#071828;color:#60a5fa;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;">Enviar</button>
-      <div id="fb-result" style="margin-top:8px;font-size:12px;text-align:center;min-height:18px;"></div>
-    </form>
-    <button onclick="closeFeedbackModal()" style="width:100%;padding:9px;border-radius:10px;border:1px solid #18233a;background:#0d1628;color:#3a5070;cursor:pointer;font-size:12px;font-family:inherit;margin-top:8px;">Cerrar</button>
+  <div class="modal-box" style="max-width:340px;text-align:center;">
+    <div style="font-size:20px;margin-bottom:8px;">💬</div>
+    <div style="font-size:16px;font-weight:800;color:#c0d0ec;margin-bottom:8px;">¿Sugerencias o errores?</div>
+    <div style="font-size:13px;color:#5a7090;margin-bottom:20px;line-height:1.5;">Escribinos directamente a:</div>
+    <a href="mailto:franciscosamacoits@gmail.com?subject=Sugerencia%20%E2%80%93%20FCE%20UBA%20Correlatividades"
+       style="display:block;padding:13px;border-radius:10px;border:1.5px solid #60a5fa;background:#071828;color:#60a5fa;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:10px;word-break:break-all;">
+      franciscosamacoits@gmail.com
+    </a>
+    <div style="font-size:11px;color:#2a3850;margin-bottom:18px;">Hacé clic para abrir tu cliente de mail</div>
+    <button onclick="closeFeedbackModal()" style="width:100%;padding:10px;border-radius:10px;border:1px solid #18233a;background:#0d1628;color:#3a5070;cursor:pointer;font-size:13px;font-family:inherit;">Cerrar</button>
   </div>
 </div>
 
