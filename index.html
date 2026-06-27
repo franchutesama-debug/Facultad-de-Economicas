@@ -134,9 +134,9 @@
 <!-- SELECTOR -->
 <div id="selector">
   <h1>FCE UBA &middot; Correlatividades</h1>
-  <p class="sub">Ingresa tu legajo y elige tu carrera</p>
+  <p class="sub">Ingresa tu número de registro y elegí tu carrera</p>
   <div id="legajo-row">
-    <label id="legajo-lbl" for="legajo-input">Legajo:</label>
+    <label id="legajo-lbl" for="legajo-input">Nro. de Registro:</label>
     <input type="number" id="legajo-input" placeholder="Ej: 1234567" min="0" />
   </div>
   <div class="career-grid">
@@ -187,14 +187,15 @@
     <div id="mcode"></div><div id="mname"></div><div id="mstatus"></div>
     <div class="msec" id="hist-sec"><div class="mlbl" id="hist-lbl">Historial:</div><ul id="mhist"></ul></div>
     <div class="msec" id="reg-sec">
-      <div class="mlbl" id="reg-lbl">Registrar cursada:</div>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <input type="number" class="grade-inp" id="mgrade" min="1" max="10" step="0.5" placeholder="1&ndash;10" />
-        <div style="font-size:10px;color:#2a3850;line-height:1.4">Ingresa la nota<br>y eleg&iacute; el estado</div>
-      </div>
-      <div class="btn-row">
+      <div class="mlbl">Estado:</div>
+      <div class="btn-row" style="margin-bottom:12px">
         <button class="btn-green" onclick="doRegistrar(true)">&#10003; Aprobada</button>
         <button class="btn-red-s" onclick="doRegistrar(false)">&#10007; Desaprobada</button>
+      </div>
+      <div class="mlbl">Registrar nota al promedio:</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" class="grade-inp" id="mgrade" min="1" max="10" step="0.5" placeholder="1&ndash;10" />
+        <button class="btn-green" style="flex:1" onclick="doAddGrade()">Guardar nota</button>
       </div>
     </div>
     <button class="btn-ghost" id="mdelete" onclick="doDeleteLast()">Eliminar &uacute;ltimo registro</button>
@@ -242,11 +243,11 @@
 // CBC COURSES PER CAREER
 // ============================================================
 var CBC_COURSES = {
-  actuario:      [{id:'cbc1',name:'Análisis Matemático I'},{id:'cbc2',name:'Economía General'},{id:'cbc3',name:'Sociología'},{id:'cbc4',name:'Metodología de las Cs. Sociales'},{id:'cbc5',name:'Álgebra'},{id:'cbc6',name:'Historia Econ. y Social General'}],
+  actuario:      [{id:'cbc_241',name:'Análisis Matemático I'},{id:'cbc_242',name:'Economía'},{id:'cbc_245',name:'Álgebra'},{id:'cbc_246',name:'Historia Econ. y Social General'},{id:'cbc_255',name:'Análisis Contable'},{id:'cbc_256',name:'Inst. de Gobierno y Ec. Política'}],
   contador:      [{id:'cbc_241',name:'Análisis Matemático I'},{id:'cbc_242',name:'Economía'},{id:'cbc_243',name:'Sociología'},{id:'cbc_244',name:'Metodología de las Cs. Sociales'},{id:'cbc_245',name:'Álgebra'},{id:'cbc_246',name:'Historia Econ. y Social General'}],
   administracion:[{id:'cbc_241',name:'Análisis Matemático I'},{id:'cbc_242',name:'Economía'},{id:'cbc_245',name:'Álgebra'},{id:'cbc_246',name:'Historia Econ. y Social General'},{id:'cbc_252',name:'Administración General'},{id:'cbc_254',name:'Sociología de las Organizaciones'}],
   economia:      [{id:'cbc_241',name:'Análisis Matemático I'},{id:'cbc_242',name:'Economía'},{id:'cbc_245',name:'Álgebra'},{id:'cbc_246',name:'Historia Econ. y Social General'},{id:'cbc_255',name:'Análisis Contable'},{id:'cbc_256',name:'Inst. de Gobierno y Ec. Política'}],
-  sistemas:      [{id:'cbcs_mat',name:'Análisis Matemático'},{id:'cbcs_eco',name:'Economía'},{id:'cbcs_alg',name:'Álgebra'},{id:'cbcs_his',name:'Historia Econ. y Social General'},{id:'cbcs_adm',name:'Administración General'},{id:'cbcs_soc',name:'Sociología de las Organizaciones'}]
+  sistemas:      [{id:'cbc_241',name:'Análisis Matemático I'},{id:'cbc_242',name:'Economía'},{id:'cbc_245',name:'Álgebra'},{id:'cbc_246',name:'Historia Econ. y Social General'},{id:'cbc_252',name:'Administración General'},{id:'cbc_254',name:'Sociología de las Organizaciones'}]
 };
 
 // ============================================================
@@ -254,14 +255,14 @@ var CBC_COURSES = {
 // ============================================================
 var ELECTIVAS = {
   actuario: { required:2, list:[
-    {id:'eopt_dem',name:'Demografía y Seguridad Social',          prereqs:['753'],       reqTxt:'Biometría Actuarial'},
-    {id:'eopt_num',name:'Análisis Numérico Avanzado',         prereqs:['752','746'], reqTxt:'Análisis Numérico + Comp. Científica Act.'},
-    {id:'eopt_his',name:'Historia Econ. y Pol. Econ. en Argentina',  prereqs:['CBC'],       reqTxt:'Ciclo General aprobado'},
-    {id:'eopt_mac',name:'Macroeconomía II',                       prereqs:['262','544'], reqTxt:'Macroeconomía I + Mat. Aplicada II'},
-    {id:'eopt_ec1',name:'Econometría I',                          prereqs:['540','544'], reqTxt:'Análisis Estadístico + Mat. Aplicada II'},
-    {id:'eopt_ec2',name:'Econometría II',                         prereqs:['eopt_ec1'],  reqTxt:'Econometría I (electiva)'},
-    {id:'eopt_cos',name:'Gestión de Costos',                      prereqs:['CBC'],       reqTxt:'Ciclo General aprobado'},
-    {id:'eopt_pod',name:'Poder Económico y Derechos Humanos',     prereqs:['754'],       reqTxt:'Act. 1 - Seg. Personales'}
+    {id:'720',name:'Demografía y Seguridad Social',                           prereqs:['753'],       reqTxt:'Biometría Actuarial (753)'},
+    {id:'784',name:'Análisis Numérico Avanzado',                          prereqs:['752','746'], reqTxt:'Análisis Numérico (752) + Comp. Cient. Act. (746)'},
+    {id:'541',name:'Historia de la Ec. y Pol. Ec. en Argentina',         prereqs:['CBC'],       reqTxt:'Ciclo General aprobado'},
+    {id:'283',name:'Macroeconomía II',                                        prereqs:['262','544'], reqTxt:'Macroeconomía I (262) + Mat. Aplicada II (544)'},
+    {id:'543',name:'Econometría I',                                           prereqs:['540','544'], reqTxt:'Análisis Estadístico I (540) + Mat. Aplicada II (544)'},
+    {id:'546',name:'Econometría II',                                          prereqs:['543'],       reqTxt:'Econometría I (543)'},
+    {id:'464',name:'Gestión de Costos',                                       prereqs:['CBC'],       reqTxt:'Ciclo General aprobado'},
+    {id:'721',name:'Poder Económico y Derechos Humanos',                      prereqs:['754'],       reqTxt:'Act. 1 - Seg. Personales (754)'}
   ]},
   economia: { required:4, list:[
     {id:'eopt_pso',name:'Economía de la Protección Social',                    prereqs:[],reqTxt:''},
@@ -298,10 +299,13 @@ var ELECTIVAS = {
     {id:'eopt_csa',name:'Contabilidad Ambiental y Social',               prereqs:[],reqTxt:''}
   ]},
   sistemas: { required:2, list:[
-    {id:'eopt_dg', name:'Dirección General',                                          prereqs:[],reqTxt:''},
-    {id:'eopt_git',name:'Gestión de la Innovación y Tecnología Informática', prereqs:[],reqTxt:''},
-    {id:'eopt_ce', name:'Comercio Electrónico',                                        prereqs:[],reqTxt:''},
-    {id:'eopt_gd', name:'Gobierno de Datos, Analítica e Inteligencia de Negocios',    prereqs:[],reqTxt:''}
+    {id:'470', name:'Ciencias de la Decisión',                      prereqs:['661'], reqTxt:'Lógica Simbólica (661)'},
+    {id:'485', name:'Fintech, Pagos Digitales y Criptoactivos',     prereqs:[],      reqTxt:''},
+    {id:'700', name:'Economía y Negocios Digitales',                prereqs:[],      reqTxt:''},
+    {id:'701', name:'Analítica de Datos',                           prereqs:[],      reqTxt:''},
+    {id:'702', name:'Auditoría de Sistemas de Información',         prereqs:['662'], reqTxt:'Seguridad Informática (662)'},
+    {id:'716', name:'Gestión de la Innovación y Tec. Informática',  prereqs:[],      reqTxt:''},
+    {id:'1711',name:'Gestión de la Inteligencia Artificial',        prereqs:[],      reqTxt:''}
   ]}
 };
 
@@ -315,24 +319,24 @@ var CAREERS = {
     {id:'262',name:'Macroeconomía I',                     prereqs:['CBC']},
     {id:'274',name:'Sistemas Administrativos',                 prereqs:['CBC']},
     {id:'462',name:'Derecho Empresarial',                      prereqs:['CBC']},
-    {id:'602',name:'Análisis Estadístico II',        prereqs:['540','542']},
-    {id:'544',name:'Matemática Aplicada II',              prereqs:['542']},
-    {id:'291',name:'Microeconomía',                       prereqs:['542']},
-    {id:'601',name:'Matemática Fin. y Actuarial',         prereqs:['540','542']},
-    {id:'746',name:'Computación Científica Act.',    prereqs:['540','542']},
-    {id:'279',name:'Administración Financiera',           prereqs:['601']},
-    {id:'603',name:'Der. Fin., Seguros y Seg. Soc.',           prereqs:['462']},
-    {id:'752',name:'Análisis Numérico',              prereqs:['544']},
-    {id:'751',name:'Estadística Actuarial',               prereqs:['544','602']},
-    {id:'548',name:'Dinero y Bancos',                          prereqs:['279','602']},
-    {id:'753',name:'Biometría Actuarial',                 prereqs:['601','751','752']},
-    {id:'755',name:'Actuarial 2 - Seg. Patrimoniales',         prereqs:['601','751','752']},
-    {id:'758',name:'Actuarial 5 - Inv. y Financ.',             prereqs:['601','751']},
-    {id:'754',name:'Actuarial 1 - Seg. Personales',            prereqs:['753']},
-    {id:'756',name:'Actuarial 4 - Fondos y Jub.',              prereqs:['754']},
-    {id:'757',name:'Actuarial 3 - Equilibrio Act.',            prereqs:['754','755']},
-    {id:'717',name:'Modelos y Proyecciones Act.',              prereqs:['757','758','746']},
-    {id:'728',name:'Práctica Profesional Act.',           prereqs:['754','755','756']}
+    {id:'602',name:'Análisis Estadístico II',        prereqs:['540','542'],       cycle:'scb'},
+    {id:'544',name:'Matemática Aplicada II',              prereqs:['542'],         cycle:'scb'},
+    {id:'291',name:'Microeconomía',                       prereqs:['542'],         cycle:'scb'},
+    {id:'601',name:'Matemática Fin. y Actuarial',         prereqs:['540','542'],   cycle:'scb'},
+    {id:'746',name:'Computación Científica Act.',    prereqs:['540','542'],         cycle:'scb'},
+    {id:'279',name:'Administración Financiera',           prereqs:['601'],          cycle:'scb'},
+    {id:'603',name:'Der. Fin., Seguros y Seg. Soc.',           prereqs:['462'],    cycle:'scb'},
+    {id:'752',name:'Análisis Numérico',              prereqs:['544'],               cycle:'scb'},
+    {id:'751',name:'Estadística Actuarial',               prereqs:['544','602'],   cycle:'scb'},
+    {id:'548',name:'Dinero y Bancos',                          prereqs:['279','602'],cycle:'scb'},
+    {id:'753',name:'Biometría Actuarial',                 prereqs:['601','751','752'],cycle:'cp'},
+    {id:'755',name:'Actuarial 2 - Seg. Patrimoniales',         prereqs:['601','751','752'],cycle:'cp'},
+    {id:'758',name:'Actuarial 5 - Inv. y Financ.',             prereqs:['601','751'],cycle:'cp'},
+    {id:'754',name:'Actuarial 1 - Seg. Personales',            prereqs:['753'],    cycle:'cp'},
+    {id:'756',name:'Actuarial 4 - Fondos y Jub.',              prereqs:['754'],    cycle:'cp'},
+    {id:'757',name:'Actuarial 3 - Equilibrio Act.',            prereqs:['754','755'],cycle:'cp'},
+    {id:'717',name:'Modelos y Proyecciones Act.',              prereqs:['757','758','746'],cycle:'cp'},
+    {id:'728',name:'Práctica Profesional Act.',           prereqs:['754','755','756'],cycle:'cp'}
   ]},
   contador: { label:'Contador Público', cbcLabel:'Ciclo General', courses:[
     {id:'247',name:'Teoría Contable',               prereqs:['CBC']},
@@ -343,24 +347,24 @@ var CAREERS = {
     {id:'252',name:'Administración General',        prereqs:['CBC']},
     {id:'1359',name:'Derecho Económico',            prereqs:[]},
     {id:'278',name:'Macroeconomía y Pol. Econ.',    prereqs:[]},
-    {id:'273',name:'Inst. de Derecho Privado',           prereqs:['1359']},
-    {id:'274',name:'Sistemas Administrativos',           prereqs:['252']},
-    {id:'276',name:'Cálculo Financiero',            prereqs:['248']},
-    {id:'351',name:'Sistemas Contables',                 prereqs:['247']},
-    {id:'353',name:'Sistemas de Costos',                 prereqs:['247']},
-    {id:'354',name:'Der. Trabajo y Seg. Social',         prereqs:['251','1359']},
-    {id:'275',name:'Tecnología de la Información', prereqs:['274']},
-    {id:'279',name:'Administración Financiera',     prereqs:['276']},
-    {id:'362',name:'Gestión y Costos p/Contadores', prereqs:['353']},
-    {id:'1352',name:'Contabilidad Financiera',           prereqs:['351','353']},
-    {id:'1374',name:'Contabilidad Gubernamental',        prereqs:['278','1352']},
-    {id:'1330',name:'Cont. Social y Ambiental',          prereqs:['1352']},
-    {id:'356',name:'Teo. y Tec. Impositiva I',           prereqs:['251','1352']},
-    {id:'357',name:'Teo. y Tec. Impositiva II',          prereqs:['356']},
-    {id:'355',name:'Auditoría',                     prereqs:['362','1352']},
-    {id:'1360',name:'Der. Crediticio e Insolvencia',     prereqs:['273','354']},
-    {id:'1358',name:'Taller Actuación Judicial',   prereqs:['355','1360']},
-    {id:'1361',name:'Taller Práctica Profesional', prereqs:['273','279','355','1330']}
+    {id:'273',name:'Inst. de Derecho Privado',           prereqs:['1359'],          cycle:'scb'},
+    {id:'274',name:'Sistemas Administrativos',           prereqs:['252'],            cycle:'scb'},
+    {id:'276',name:'Cálculo Financiero',            prereqs:['248'],                 cycle:'scb'},
+    {id:'351',name:'Sistemas Contables',                 prereqs:['247'],            cycle:'scb'},
+    {id:'353',name:'Sistemas de Costos',                 prereqs:['247'],            cycle:'scb'},
+    {id:'354',name:'Der. Trabajo y Seg. Social',         prereqs:['251','1359'],     cycle:'scb'},
+    {id:'275',name:'Tecnología de la Información', prereqs:['274'],                  cycle:'scb'},
+    {id:'279',name:'Administración Financiera',     prereqs:['276'],                 cycle:'scb'},
+    {id:'362',name:'Gestión y Costos p/Contadores', prereqs:['353'],                 cycle:'scb'},
+    {id:'1352',name:'Contabilidad Financiera',           prereqs:['351','353'],      cycle:'scb'},
+    {id:'1374',name:'Contabilidad Gubernamental',        prereqs:['278','1352'],     cycle:'cp'},
+    {id:'1330',name:'Cont. Social y Ambiental',          prereqs:['1352'],           cycle:'cp'},
+    {id:'356',name:'Teo. y Tec. Impositiva I',           prereqs:['251','1352'],     cycle:'cp'},
+    {id:'357',name:'Teo. y Tec. Impositiva II',          prereqs:['356'],            cycle:'cp'},
+    {id:'355',name:'Auditoría',                     prereqs:['362','1352'],           cycle:'cp'},
+    {id:'1360',name:'Der. Crediticio e Insolvencia',     prereqs:['273','354'],      cycle:'cp'},
+    {id:'1358',name:'Taller Actuación Judicial',   prereqs:['355','1360'],            cycle:'cp'},
+    {id:'1361',name:'Taller Práctica Profesional', prereqs:['273','279','355','1330'],cycle:'cp'}
   ]},
   administracion: { label:'Lic. en Administración', cbcLabel:'Ciclo General', courses:[
     {id:'247',name:'Teoría Contable',               prereqs:['CBC']},
@@ -371,64 +375,64 @@ var CAREERS = {
     {id:'462',name:'Derecho Empresarial',                prereqs:['CBC']},
     {id:'463',name:'Gestión de Tecnologías Digit.', prereqs:['CBC']},
     {id:'467',name:'Gestión del Talento',          prereqs:['CBC']},
-    {id:'278',name:'Macroeconomía y Pol. Econ.',    prereqs:['250']},
-    {id:'279',name:'Administración Financiera',     prereqs:['276']},
-    {id:'464',name:'Gestión de Costos',             prereqs:['247']},
-    {id:'465',name:'Métodos Predictivos p/Gestión', prereqs:['248']},
-    {id:'466',name:'Administración de Operaciones', prereqs:['274']},
-    {id:'468',name:'Administración Tributaria',     prereqs:['278']},
-    {id:'469',name:'Marketing',                          prereqs:['466']},
-    {id:'470',name:'Ciencias de la Decisión',      prereqs:['465']},
-    {id:'471',name:'Planeamiento Estratégico',     prereqs:['279']},
-    {id:'472',name:'Dirección',                    prereqs:['467','470']},
-    {id:'473',name:'Práctica Profesional',         prereqs:['471','472']}
+    {id:'278',name:'Macroeconomía y Pol. Econ.',    prereqs:['250'],  cycle:'scb'},
+    {id:'279',name:'Administración Financiera',     prereqs:['276'],  cycle:'scb'},
+    {id:'464',name:'Gestión de Costos',             prereqs:['247'],  cycle:'scb'},
+    {id:'465',name:'Métodos Predictivos p/Gestión', prereqs:['248'],  cycle:'scb'},
+    {id:'466',name:'Administración de Operaciones', prereqs:['274'],  cycle:'scb'},
+    {id:'468',name:'Administración Tributaria',     prereqs:['278'],  cycle:'scb'},
+    {id:'469',name:'Marketing',                          prereqs:['466'],cycle:'cp'},
+    {id:'470',name:'Ciencias de la Decisión',      prereqs:['465'],   cycle:'cp'},
+    {id:'471',name:'Planeamiento Estratégico',     prereqs:['279'],   cycle:'cp'},
+    {id:'472',name:'Dirección',                    prereqs:['467','470'],cycle:'cp'},
+    {id:'473',name:'Práctica Profesional',         prereqs:['471','472'],cycle:'cp'}
   ]},
   economia: { label:'Lic. en Economía', cbcLabel:'Ciclo General', courses:[
     {id:'262',name:'Macroeconomía I',               prereqs:['CBC']},
     {id:'540',name:'Análisis Estadístico I',   prereqs:['CBC']},
     {id:'541',name:'Hist. de la Economía Argentina',prereqs:['CBC']},
     {id:'542',name:'Matemática Aplicada I',         prereqs:['CBC']},
-    {id:'544',name:'Matemática Aplicada II',        prereqs:['542']},
-    {id:'291',name:'Microeconomía p/Economistas',   prereqs:['542']},
-    {id:'543',name:'Econometría I',                 prereqs:['540','544']},
-    {id:'283',name:'Macroeconomía II',              prereqs:['262','544']},
-    {id:'286',name:'Microeconomía II',              prereqs:['291','544']},
-    {id:'545',name:'Epistemología e Hist. Pens. Ec.',prereqs:['262','291']},
-    {id:'546',name:'Econometría II',                prereqs:['543']},
-    {id:'549',name:'Economía Financiera',           prereqs:['262','291']},
-    {id:'556',name:'Finanzas Públicas',             prereqs:['291']},
-    {id:'554',name:'Crecimiento Económico',        prereqs:['283','291']},
-    {id:'555',name:'Organización Industrial',       prereqs:['286']},
-    {id:'558',name:'Economía Internacional',        prereqs:['262','286']},
-    {id:'559',name:'Desarrollo Económico',         prereqs:['262','291','543']},
-    {id:'547',name:'Estructura y Pol. Económicas', prereqs:['262','541','543','556']},
-    {id:'548',name:'Dinero y Bancos',                   prereqs:['283','546','549']}
+    {id:'544',name:'Matemática Aplicada II',        prereqs:['542'],              cycle:'scb'},
+    {id:'291',name:'Microeconomía p/Economistas',   prereqs:['542'],              cycle:'scb'},
+    {id:'543',name:'Econometría I',                 prereqs:['540','544'],        cycle:'scb'},
+    {id:'283',name:'Macroeconomía II',              prereqs:['262','544'],        cycle:'scb'},
+    {id:'286',name:'Microeconomía II',              prereqs:['291','544'],        cycle:'scb'},
+    {id:'545',name:'Epistemología e Hist. Pens. Ec.',prereqs:['262','291'],       cycle:'scb'},
+    {id:'546',name:'Econometría II',                prereqs:['543'],              cycle:'scb'},
+    {id:'549',name:'Economía Financiera',           prereqs:['262','291'],        cycle:'scb'},
+    {id:'556',name:'Finanzas Públicas',             prereqs:['291'],              cycle:'scb'},
+    {id:'554',name:'Crecimiento Económico',        prereqs:['283','291'],         cycle:'cp'},
+    {id:'555',name:'Organización Industrial',       prereqs:['286'],              cycle:'cp'},
+    {id:'558',name:'Economía Internacional',        prereqs:['262','286'],        cycle:'cp'},
+    {id:'559',name:'Desarrollo Económico',         prereqs:['262','291','543'],   cycle:'cp'},
+    {id:'547',name:'Estructura y Pol. Económicas', prereqs:['262','541','543','556'],cycle:'cp'},
+    {id:'548',name:'Dinero y Bancos',                   prereqs:['283','546','549'],cycle:'cp'}
   ]},
   sistemas: { label:'Lic. en Sistemas de Información', cbcLabel:'Ciclo General', courses:[
-    {id:'247', name:'Teoría Contable',                         prereqs:['CBC']},
-    {id:'248', name:'Estadística I',                           prereqs:['CBC']},
-    {id:'249', name:'Hist. Econ. y Social Argentina',               prereqs:['CBC']},
-    {id:'250', name:'Microeconomía I',                         prereqs:['CBC']},
-    {id:'1275',name:'Introducción a la TIC',                   prereqs:['CBC']},
-    {id:'274', name:'Sistemas Administrativos',                     prereqs:['CBC']},
-    {id:'276', name:'Cálculo Financiero',                      prereqs:['CBC']},
-    {id:'278', name:'Macroeconomía y Pol. Econ.',              prereqs:['CBC']},
-    {id:'277', name:'Gestión de Costos',                       prereqs:['247']},
-    {id:'279', name:'Administración Financiera',               prereqs:['276']},
-    {id:'651', name:'Lógica Simbólica y Fund. Decisión', prereqs:['CBC']},
-    {id:'655', name:'Tecnología de las Comunicaciones',        prereqs:['1275']},
-    {id:'1652',name:'Teoría de los Lenguajes y Algoritmos',    prereqs:['651']},
-    {id:'1653',name:'Tecnología Computadores y SSOO',          prereqs:['1275']},
-    {id:'657', name:'Sistemas de Datos',                            prereqs:['651','1275']},
-    {id:'658', name:'Metodología de los SI',                   prereqs:['274','1275']},
-    {id:'740', name:'Redes Informáticas',                      prereqs:['655']},
-    {id:'1601',name:'Ingeniería en Software',                  prereqs:['658']},
-    {id:'1603',name:'Derecho Informático I',                   prereqs:['658']},
-    {id:'1654',name:'Construcción de Aplicaciones',            prereqs:['651','657']},
-    {id:'1604',name:'Derecho Informático II',                  prereqs:['1603']},
-    {id:'1799',name:'Gestión de Recursos Informáticos',  prereqs:['658','277']},
-    {id:'1659',name:'Seguridad Informática y Auditoría', prereqs:['657','1601']},
-    {id:'1660',name:'Actuación Profesional del Lic. en Sistemas', prereqs:['1659','1799']}
+    {id:'247', name:'Teoría Contable',                                        prereqs:['CBC']},
+    {id:'248', name:'Estadística I',                                          prereqs:['CBC']},
+    {id:'249', name:'Hist. Econ. y Social Argentina',                              prereqs:['CBC']},
+    {id:'250', name:'Microeconomía I',                                        prereqs:['CBC']},
+    {id:'274', name:'Sistemas Administrativos',                                    prereqs:['CBC']},
+    {id:'276', name:'Cálculo Financiero',                                     prereqs:['CBC']},
+    {id:'278', name:'Macroeconomía y Pol. Econ.',                             prereqs:['CBC']},
+    {id:'1275',name:'Introducción a la TIC',                                  prereqs:['CBC']},
+    {id:'661', name:'Lógica Simbólica y Fund. Decisión',                prereqs:['CBC']},
+    {id:'279', name:'Administración Financiera',                              prereqs:['276'],   cycle:'scb'},
+    {id:'464', name:'Gestión de Costos',                                      prereqs:['247'],   cycle:'scb'},
+    {id:'1601',name:'Ingeniería de Software',                                 prereqs:['1275'],  cycle:'scb'},
+    {id:'1603',name:'Derecho Informático I',                                  prereqs:['1275'],  cycle:'scb'},
+    {id:'1652',name:'Teoría de los Lenguajes y Algoritmos',                   prereqs:['661'],   cycle:'scb'},
+    {id:'1653',name:'Tecnología Computadores y SSOO',                         prereqs:['1275'],  cycle:'scb'},
+    {id:'663', name:'Sistemas de Datos',                                           prereqs:['661'],cycle:'scb'},
+    {id:'658', name:'Metodología de los SI',                                  prereqs:['1601'],  cycle:'scb'},
+    {id:'1604',name:'Derecho Informático II',                                 prereqs:['1603'],  cycle:'scb'},
+    {id:'1654',name:'Construcción de Aplicaciones',                           prereqs:['1652'],  cycle:'scb'},
+    {id:'655', name:'Tecnología de las Comunicaciones',                       prereqs:['1653'],  cycle:'scb'},
+    {id:'662', name:'Seguridad Informática y Prin. de Auditoría',       prereqs:['663'],         cycle:'scb'},
+    {id:'740', name:'Redes Informáticas',                                     prereqs:['655'],   cycle:'cp'},
+    {id:'1799',name:'Gestión de Recursos Informáticos',                 prereqs:['658','662'],   cycle:'cp'},
+    {id:'1660',name:'Actuación Profesional del Lic. en Sistemas',             prereqs:['740','1654'],cycle:'cp'}
   ]}
 };
 
@@ -511,7 +515,7 @@ function getCyStyle(){
 }
 function initCy(key){
   if(cy){cy.destroy();cy=null;}
-  cy=cytoscape({container:document.getElementById('cy'),elements:buildElements(key),layout:{name:'preset'},minZoom:.06,maxZoom:4,style:getCyStyle()});
+  cy=cytoscape({container:document.getElementById('cy'),elements:buildElements(key),layout:{name:'preset'},minZoom:.06,maxZoom:4,autoungrabify:true,style:getCyStyle()});
   cy.on('tap','node',function(e){var id=e.target.id();if(id.indexOf('__bdg__')===0)openModal(id.slice(7));else openModal(id);});
   cy.on('position','node',function(e){var id=e.target.id();if(id.indexOf('__bdg__')===0)return;var b=cy.getElementById('__bdg__'+id);if(b.length){var np=e.target.position();b.position({x:np.x+NW/2-7,y:np.y-NH/2+7});}});
   setTimeout(resetView,60);updateAll();
@@ -535,11 +539,18 @@ function rebuildBadges(){
   });
 }
 function nearGrad(courses){var rem=courses.filter(function(c){return !courseState[c.id]||!courseState[c.id].approved;}).length;return rem<=5&&rem>0;}
+function countSCBApproved(courses){
+  return courses.filter(function(c){return c.cycle==='scb'&&courseState[c.id]&&courseState[c.id].approved;}).length;
+}
 function isAvail(course,courses){
   if(courseState[course.id]&&courseState[course.id].approved)return false;
   if(nearGrad(courses))return true;
   var cbc=getCBCState();
   for(var i=0;i<(course.prereqs||[]).length;i++){var p=course.prereqs[i];if(p==='CBC'){if(!cbc)return false;}else{if(!courseState[p]||!courseState[p].approved)return false;}}
+  if(course.cycle==='cp'){
+    if(!cbc)return false;
+    if(countSCBApproved(courses)<3)return false;
+  }
   return true;
 }
 
@@ -565,7 +576,7 @@ function updateAll(){
     var node=cy.getElementById(c.id);if(!node.length)return;
     var st=courseState[c.id]||{};
     var approved=!!st.approved,avail=isAvail(c,courses),hasFailed=!approved&&st.history&&st.history.length>0;
-    node.data('label',approved&&st.grade!=null?c.name+'\n['+st.grade+']':(hasFailed?c.name+'\n[desap.]':c.name));
+    node.data('label',approved?(c.name+(st.grade!=null?'\n['+st.grade+']':'\n[✓]')):(hasFailed?c.name+'\n[desap.]':c.name));
     node.removeClass('approved avail failed locked');
     if(approved)node.addClass('approved');
     else if(hasFailed)node.addClass('failed');
@@ -610,9 +621,9 @@ function selectCareer(key){
   document.getElementById('career-lbl').textContent=CAREERS[key].label;
   var l=currentLegajo!=='invitado'?currentLegajo:null;
   var badge=document.getElementById('user-badge');
-  badge.textContent=l?'Legajo: '+l:'';
+  badge.textContent=l?'Registro: '+l:'';
   badge.title=l?'Clic para copiar':'';
-  badge.onclick=l?function(){navigator.clipboard&&navigator.clipboard.writeText(l);badge.textContent='¡Copiado!';setTimeout(function(){badge.textContent='Legajo: '+l;},1200);}:null;
+  badge.onclick=l?function(){navigator.clipboard&&navigator.clipboard.writeText(l);badge.textContent='¡Copiado!';setTimeout(function(){badge.textContent='Registro: '+l;},1200);}:null;
   descMap=buildDescMap(CAREERS[key].courses);
   initCy(key);
 }
@@ -650,8 +661,8 @@ function saveCBC(){
     var grade=(!isNaN(raw)&&raw>=1&&raw<=10)?raw:null;
     var st=courseState[c.id]||{approved:false,grade:null,history:[]};
     var hist=(st.history||[]).slice();
-    if(grade!=null&&grade!==st.grade)hist.push({g:grade,pass:approved&&grade>=4});
-    courseState[c.id]={approved:approved&&grade!=null&&+grade>=4,grade:(approved&&grade!=null&&+grade>=4)?grade:null,history:hist};
+    if(grade!=null){hist.push({g:grade,pass:grade>=4});}
+    courseState[c.id]={approved:approved,grade:approved&&grade!=null?grade:(approved?st.grade:null),history:hist};
   });
   lsSet(stateKey(),courseState);closeCBCModal();updateAll();
 }
@@ -679,6 +690,11 @@ function openModal(courseId){
     var cbc=getCBCState();
     var miss=(course.prereqs||[]).filter(function(p){if(p==='CBC')return !cbc;return !courseState[p]||!courseState[p].approved;})
       .map(function(p){if(p==='CBC')return CAREERS[currentCareer].cbcLabel;var c2=courses.find(function(x){return x.id===p;});return c2?c2.name:p;});
+    if(course.cycle==='cp'){
+      if(!cbc&&miss.indexOf(CAREERS[currentCareer].cbcLabel)<0)miss.unshift(CAREERS[currentCareer].cbcLabel);
+      var scbOk=countSCBApproved(courses);
+      if(scbOk<3)miss.unshift((3-scbOk)+' mat. del 2do Ciclo Básico');
+    }
     stEl.textContent='Bloqueada — falta: '+(miss.join(', ')||'?');
   }
   var histSec=document.getElementById('hist-sec'),hEl=document.getElementById('mhist');hEl.innerHTML='';
@@ -697,20 +713,25 @@ function openModal(courseId){
   var regSec=document.getElementById('reg-sec');
   if(isAvail(course,courses)||approved||history.length>0){
     regSec.style.display='block';document.getElementById('mgrade').value='';
-    document.getElementById('reg-lbl').textContent=history.length>0?'Registrar nueva cursada:':'Registrar cursada:';
   } else { regSec.style.display='none'; }
   document.getElementById('mdelete').style.display=history.length>0?'block':'none';
   document.getElementById('moverlay').classList.remove('hidden');
 }
 function doRegistrar(pass){
   if(!modalId||!currentCareer)return;
+  var st=courseState[modalId]||{approved:false,grade:null,history:[]};
+  courseState[modalId]={approved:pass,grade:pass?(st.grade):null,history:(st.history||[]).slice()};
+  lsSet(stateKey(),courseState);closeModal();updateAll();
+}
+function doAddGrade(){
+  if(!modalId||!currentCareer)return;
   var raw=parseFloat(document.getElementById('mgrade').value);
   if(isNaN(raw)||raw<1||raw>10){alert('Nota entre 1 y 10');return;}
-  if(pass&&raw<4){alert('Para aprobar la nota tiene que ser 4 o mayor.');return;}
-  if(!pass&&raw>3){alert('Para desaprobar la nota tiene que ser 3 o menor (1, 2 o 3).');return;}
   var st=courseState[modalId]||{approved:false,grade:null,history:[]};
-  var hist=(st.history||[]).slice();hist.push({g:raw,pass:pass});
-  courseState[modalId]={approved:pass,grade:pass?raw:null,history:hist};
+  var hist=(st.history||[]).slice();hist.push({g:raw,pass:raw>=4});
+  var approved=st.approved;
+  var grade=approved?(raw>=4?raw:st.grade):null;
+  courseState[modalId]={approved:approved,grade:grade,history:hist};
   lsSet(stateKey(),courseState);closeModal();updateAll();
 }
 function doDeleteLast(){
@@ -759,13 +780,19 @@ function renderElectivasList(){
       row.appendChild(hi);
     }
     if(avail||approved||hasFailed){
-      var btns=document.createElement('div');btns.className='erow-btns';
-      var gi=document.createElement('input');gi.type='number';gi.className='eg-inp';gi.min=1;gi.max=10;gi.step=0.5;gi.placeholder='1–10';
+      var btns=document.createElement('div');btns.className='erow-btns';btns.style.flexDirection='column';btns.style.gap='6px';
+      var sr=document.createElement('div');sr.style.display='flex';sr.style.gap='6px';
       var bg=document.createElement('button');bg.className='ebtn-g ebtn-p';bg.textContent='✓ Aprobada';
-      bg.onclick=(function(eid,inp){return function(){doRegistrarE(eid,inp,true);};})(e.id,gi);
+      bg.onclick=(function(eid){return function(){doRegistrarE(eid,true);};})(e.id);
       var bf=document.createElement('button');bf.className='ebtn-g ebtn-f';bf.textContent='✗ Desap.';
-      bf.onclick=(function(eid,inp){return function(){doRegistrarE(eid,inp,false);};})(e.id,gi);
-      btns.appendChild(gi);btns.appendChild(bg);btns.appendChild(bf);
+      bf.onclick=(function(eid){return function(){doRegistrarE(eid,false);};})(e.id);
+      sr.appendChild(bg);sr.appendChild(bf);
+      var gr=document.createElement('div');gr.style.display='flex';gr.style.gap='6px';
+      var gi=document.createElement('input');gi.type='number';gi.className='eg-inp';gi.min=1;gi.max=10;gi.step=0.5;gi.placeholder='1–10';
+      var bs=document.createElement('button');bs.className='ebtn-g';bs.style.flex='1';bs.textContent='Guardar nota';
+      bs.onclick=(function(eid,inp){return function(){doAddGradeE(eid,inp);};})(e.id,gi);
+      gr.appendChild(gi);gr.appendChild(bs);
+      btns.appendChild(sr);btns.appendChild(gr);
       if(hist.length>0){var bd=document.createElement('button');bd.className='ebtn-del';bd.textContent='Borrar últ.';bd.onclick=(function(eid){return function(){doDeleteLastE(eid);};})(e.id);btns.appendChild(bd);}
       row.appendChild(btns);
     }
@@ -773,14 +800,18 @@ function renderElectivasList(){
   });
   document.getElementById('emod-custom-name').value='';
 }
-function doRegistrarE(eid,inp,pass){
+function doRegistrarE(eid,pass){
+  var st=courseState[eid]||{approved:false,grade:null,history:[]};
+  courseState[eid]={approved:pass,grade:pass?st.grade:null,history:(st.history||[]).slice()};
+  lsSet(stateKey(),courseState);renderElectivasList();updateAll();
+}
+function doAddGradeE(eid,inp){
   var raw=parseFloat(inp.value);
   if(isNaN(raw)||raw<1||raw>10){alert('Nota entre 1 y 10');return;}
-  if(pass&&raw<4){alert('Para aprobar la nota tiene que ser 4 o mayor.');return;}
-  if(!pass&&raw>3){alert('Para desaprobar la nota tiene que ser 3 o menor (1, 2 o 3).');return;}
   var st=courseState[eid]||{approved:false,grade:null,history:[]};
-  var hist=(st.history||[]).slice();hist.push({g:raw,pass:pass});
-  courseState[eid]={approved:pass,grade:pass?raw:null,history:hist};
+  var hist=(st.history||[]).slice();hist.push({g:raw,pass:raw>=4});
+  var grade=st.approved?(raw>=4?raw:st.grade):null;
+  courseState[eid]={approved:st.approved,grade:grade,history:hist};
   lsSet(stateKey(),courseState);renderElectivasList();updateAll();
 }
 function doDeleteLastE(eid){
@@ -827,9 +858,9 @@ window.addEventListener('load',function(){
     <div style="font-size:20px;margin-bottom:8px;">💬</div>
     <div style="font-size:16px;font-weight:800;color:#c0d0ec;margin-bottom:8px;">¿Sugerencias o errores?</div>
     <div style="font-size:13px;color:#5a7090;margin-bottom:20px;line-height:1.5;">Escribinos directamente a:</div>
-    <a href="mailto:franciscosamacoits@gmail.com?subject=Sugerencia%20%E2%80%93%20FCE%20UBA%20Correlatividades"
+    <a href="mailto:franciscosaamacoits@gmail.com?subject=Sugerencia%20%E2%80%93%20FCE%20UBA%20Correlatividades"
        style="display:block;padding:13px;border-radius:10px;border:1.5px solid #60a5fa;background:#071828;color:#60a5fa;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:10px;word-break:break-all;">
-      franciscosamacoits@gmail.com
+      franciscosaamacoits@gmail.com
     </a>
     <div style="font-size:11px;color:#2a3850;margin-bottom:18px;">Hacé clic para abrir tu cliente de mail</div>
     <button onclick="closeFeedbackModal()" style="width:100%;padding:10px;border-radius:10px;border:1px solid #18233a;background:#0d1628;color:#3a5070;cursor:pointer;font-size:13px;font-family:inherit;">Cerrar</button>
