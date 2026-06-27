@@ -2,303 +2,397 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <!-- Habilitar escala responsiva para dispositivos móviles -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0" />
-  <title>Diagrama de correlatividades – Carrera de Actuario (optativas, fijo)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Correlatividades – Actuario</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.24.1/cytoscape.min.js"></script>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #fafafa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(145deg, #060a16 0%, #0b1124 50%, #090f1e 100%);
+      overflow: hidden; min-height: 100vh;
     }
+
+    /* ── Fondo matemático ──────────────────────────────────────────── */
+    #math-bg {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .ms {
+      position: absolute;
+      font-family: 'Times New Roman', Georgia, serif;
+      color: #162033; user-select: none; pointer-events: none; line-height: 1;
+    }
+
+    /* ── Header ────────────────────────────────────────────────────── */
+    #header {
+      position: relative; z-index: 2;
+      padding: 8px 18px 5px;
+      background: rgba(6, 10, 22, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #18233a;
+    }
+
     h2 {
-      margin: 16px 0 8px 0;
-      text-align: center;
-      font-size: 24px;
+      text-align: center; font-size: 17px;
+      color: #c0d0ec; letter-spacing: 0.5px;
+      margin-bottom: 6px; font-weight: 600;
+    }
+
+    /* Fila superior: progreso + CBC toggle */
+    #top-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 5px;
     }
     #progress-container {
-      width: 85%;
-      margin: 0 auto 10px auto;
-      height: 22px;
-      background: #e0e0e0;
-      border-radius: 10px;
-      position: relative;
+      flex: 1; height: 15px; border-radius: 8px;
+      background: #0d1628; position: relative;
+      border: 1px solid #1a2540; min-width: 0;
     }
     #progress-bar {
-      height: 100%;
-      width: 0%;
-      background: #4caf50;
-      border-radius: 10px;
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #16a34a, #4ade80);
+      border-radius: 8px; transition: width 0.35s ease;
     }
     #progress-text {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 13px;
-      color: #333;
-      font-weight: bold;
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%,-50%);
+      font-size: 10px; color: #3a5070; font-weight: 700; white-space: nowrap;
     }
+
+    /* CBC toggle */
+    #cbc-btn {
+      flex-shrink: 0;
+      padding: 3px 11px 3px 8px;
+      border-radius: 20px; border: 1.5px solid #1e2e48;
+      background: #0d1425; color: #2e4060; cursor: pointer;
+      font-size: 11px; font-family: inherit;
+      display: flex; align-items: center; gap: 5px;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      white-space: nowrap;
+    }
+    #cbc-btn.done {
+      border-color: #4ade80; background: #071a10; color: #4ade80;
+    }
+    #cbc-icon { font-size: 13px; line-height: 1; }
+
+    /* Leyenda */
     #legend {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      padding-bottom: 10px;
-      font-size: 14px;
-      flex-wrap: wrap;
+      display: flex; justify-content: center;
+      gap: 14px; font-size: 10px; flex-wrap: wrap;
+      color: #3a5070; padding-bottom: 2px;
     }
-    .legend-item {
-      display: flex;
-      align-items: center;
-    }
-    .legend-color {
-      width: 18px;
-      height: 18px;
-      margin-right: 6px;
-      border: 1px solid #333;
-    }
+    .li { display: flex; align-items: center; gap: 4px; }
+    .ld { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+    .lb { width: 13px; height: 13px; border-radius: 50%; background: #ca8a04; flex-shrink: 0; }
+
+    #hint { text-align: center; font-size: 9px; color: #1a2a3e; margin-top: 2px; }
+
+    /* ── Canvas ────────────────────────────────────────────────────── */
     #cy {
-      width: 100%;
-      height: calc(100vh - 160px);
-      display: block;
+      position: relative; z-index: 1;
+      width: 100%; height: calc(100vh - 96px);
+      background: transparent;
+    }
+
+    @media (max-width: 480px) {
+      h2 { font-size: 14px; }
+      #cy { height: calc(100vh - 90px); }
     }
   </style>
 </head>
 <body>
-  <!-- Título simplificado -->
-  <h2>Actuario</h2>
-  <div id="progress-container">
-    <div id="progress-bar"></div>
-    <span id="progress-text">0% completado</span>
+
+<div id="math-bg" aria-hidden="true"></div>
+
+<div id="header">
+  <h2>Actuario — Diagrama de correlatividades</h2>
+  <div id="top-row">
+    <div id="progress-container">
+      <div id="progress-bar"></div>
+      <span id="progress-text">0% completado</span>
+    </div>
+    <button id="cbc-btn" class="done" onclick="toggleCBC()">
+      <span id="cbc-icon">✓</span>
+      <span>CBC</span>
+    </button>
   </div>
   <div id="legend">
-    <div class="legend-item">
-      <span class="legend-color" style="background-color:#4caf50"></span>
-      Aprobada
-    </div>
-    <div class="legend-item">
-      <span class="legend-color" style="background-color:#2196f3"></span>
-      Cumple requisitos
-    </div>
-    <div class="legend-item">
-      <span class="legend-color" style="background-color:#9e9e9e"></span>
-      No cumple requisitos
-    </div>
+    <div class="li"><span class="ld" style="background:#0a2518;border:1.5px solid #4ade80"></span>Aprobada</div>
+    <div class="li"><span class="ld" style="background:#0a1a32;border:1.5px solid #60a5fa"></span>Disponible</div>
+    <div class="li"><span class="ld" style="background:#0b1220;border:1px solid #1a2535"></span>Bloqueada</div>
+    <div class="li"><span class="lb"></span>Materias que abre</div>
   </div>
-  <div id="cy"></div>
-  <script>
-    // Detectamos si la pantalla es estrecha (dispositivo móvil) y ajustamos las dimensiones
-    const isMobile = window.innerWidth <= 600;
-    const nodeFontSize = isMobile ? 14 : 12;
-    // Aumentamos el tamaño de los nodos en móviles para mejorar la legibilidad
-    const nodeWidth = isMobile ? 180 : 200;
-    const nodeHeight = isMobile ? 80 : 80;
-    // Para dispositivos móviles, usamos un espaciado diferente y orientamos el gráfico de arriba hacia abajo
-    const xSpacing = isMobile ? 200 : 280;
-    const ySpacing = isMobile ? 120 : 100;
+  <div id="hint">Tocá un nodo disponible para marcarlo · Pellizca para zoom</div>
+</div>
 
-    const courses = [
-      { id: '245', name: 'Álgebra', prerequisites: [] },
-      { id: '241', name: 'Análisis matemático 1', prerequisites: [] },
-      { id: '242', name: 'Economía', prerequisites: [] },
-      { id: '246', name: 'Historia económica y social argentina', prerequisites: [] },
-      { id: '255', name: 'Análisis contable', prerequisites: [] },
-      { id: '256', name: 'Inst. de Gobierno y Economía Política', prerequisites: [] },
-      { id: '540', name: 'Análisis estadístico', prerequisites: ['245','241','242','246','255','256'] },
-      { id: '542', name: 'Matemática aplicada I', prerequisites: ['245','241','242','246','255','256'] },
-      { id: '262', name: 'Macroeconomía', prerequisites: ['245','241','242','246','255','256'] },
-      { id: '274', name: 'Sistemas administrativos', prerequisites: ['245','241','242','246','255','256'] },
-      { id: '462', name: 'Derecho empresarial', prerequisites: ['245','241','242','246','255','256'] },
-      { id: '602', name: 'Análisis estadístico II', prerequisites: ['540','542'] },
-      { id: '544', name: 'Matemática aplicada II', prerequisites: ['542'] },
-      { id: '291', name: 'Microeconomía p/economistas', prerequisites: ['542'] },
-      { id: '279', name: 'Administración financiera', prerequisites: ['601'] },
-      { id: '603', name: 'Derecho financiero, seguros y seguridad social', prerequisites: ['462'] },
-      { id: '746', name: 'Computación científica actuarial', prerequisites: ['540','542'] },
-      { id: '601', name: 'Matemática financiera y actuarial', prerequisites: ['540','542'] },
-      { id: '752', name: 'Análisis numérico', prerequisites: ['544'] },
-      { id: '548', name: 'Dinero y bancos', prerequisites: ['279','602'] },
-      { id: '751', name: 'Estadística actuarial', prerequisites: ['544','602'] },
-      { id: '753', name: 'Biometría actuarial', prerequisites: ['601','751','752'] },
-      { id: '754', name: 'Teoría actuarial de los seguros personales (Act.1)', prerequisites: ['753'] },
-      { id: '755', name: 'Teoría actuarial de los seguros patrimoniales (Act.2)', prerequisites: ['601','751','752'] },
-      { id: '756', name: 'Teoría actuarial de los fondos y plan de jub., pensión y salud (Act.4)', prerequisites: ['754'] },
-      { id: '757', name: 'Teoría del equilibrio actuarial (Act.3)', prerequisites: ['754','755'] },
-      { id: '758', name: 'Bases actuariales de las inversiones y financiaciones (Act.5)', prerequisites: ['601','751'] },
-      { id: '717', name: 'Modelos y proyecciones actuariales', prerequisites: ['757','758','746'] },
-      { id: '728', name: 'Práctica profesional del actuario', prerequisites: ['754','755','756'] },
-      { id: 'OPT1', name: 'Optativa 1', prerequisites: [] },
-      { id: 'OPT2', name: 'Optativa 2', prerequisites: [] }
-    ];
+<div id="cy"></div>
 
-    const courseState = {};
-    courses.forEach(c => { courseState[c.id] = false; });
+<script>
+// ── Fondo matemático ─────────────────────────────────────────────────────────
+const SYM = [
+  '∫₀^∞','∑ᵢxᵢ','E[X]','Var(X)','σ²','f(x)dx','μ','λ','Φ(t)',
+  'P(T>t)','äₓ','qₓ','pₓ','ₙpₓ','e^{-δt}','∂/∂t','lim_{n→∞}',
+  '√n','π','∞','F(x)','P(A|B)','L(θ)','ℓₓ','Aₓ','ä_{x:n̄|}',
+  'v^t','α','β','γ','δ','θ','ρ','ω','Cov(X,Y)',
+  'E[T]','log L','∇f','det(A)','n!','ℙ(Ω)=1','i=(1+δ)−1',
+  'lₓ','dₓ','mₓ','tqx','ₙEₓ','ax','Ā_x','²Aₓ'
+];
+const bg = document.getElementById('math-bg');
+for (let i = 0; i < 62; i++) {
+  const el = document.createElement('span');
+  el.className = 'ms';
+  el.textContent = SYM[i % SYM.length];
+  el.style.cssText = `
+    left:${(Math.random()*97).toFixed(1)}%;
+    top:${(Math.random()*97).toFixed(1)}%;
+    font-size:${(11+Math.random()*44).toFixed(0)}px;
+    opacity:${(0.4+Math.random()*0.55).toFixed(2)};
+    transform:rotate(${((Math.random()-.5)*54).toFixed(1)}deg);
+  `;
+  bg.appendChild(el);
+}
 
-    const levelMap = {};
-    const courseById = {};
-    courses.forEach(c => { courseById[c.id] = c; });
+// ── Config ───────────────────────────────────────────────────────────────────
+const isMobile = window.innerWidth <= 768;
+const NW  = isMobile ? 138 : 200;   // node width
+const NH  = isMobile ? 62  : 80;    // node height
+const NFZ = isMobile ? 10  : 13;    // node font size
+const XS  = isMobile ? 160 : 240;   // x spacing (más compacto en desktop)
+const YS  = isMobile ? 80  : 98;    // y spacing
+const BS  = isMobile ? 20  : 24;    // badge size
+const BFZ = isMobile ? 9   : 11;    // badge font size
 
-    function computeLevel(id) {
-      if (levelMap[id] !== undefined) return levelMap[id];
-      const course = courseById[id];
-      if (!course || course.prerequisites.length === 0) {
-        levelMap[id] = 0;
-      } else {
-        const levels = course.prerequisites.map(pr => computeLevel(pr));
-        levelMap[id] = Math.max(...levels) + 1;
+// ── Materias ─────────────────────────────────────────────────────────────────
+// CBC vive en el estado pero NO es un nodo del grafo.
+// Las materias que antes dependían de las 6 del CBC ahora dependen de 'CBC' (el toggle).
+const courses = [
+  // CBC — solo estado, sin nodo en el grafo
+  { id: 'CBC', noGraph: true },
+
+  { id: '540', name: 'Análisis estadístico',                prerequisites: ['CBC'] },
+  { id: '542', name: 'Matemática aplicada I',               prerequisites: ['CBC'] },
+  { id: '262', name: 'Macroeconomía',                       prerequisites: ['CBC'] },
+  { id: '274', name: 'Sistemas administrativos',            prerequisites: ['CBC'] },
+  { id: '462', name: 'Derecho empresarial',                 prerequisites: ['CBC'] },
+  { id: '602', name: 'Análisis estadístico II',             prerequisites: ['540','542'] },
+  { id: '544', name: 'Matemática aplicada II',              prerequisites: ['542'] },
+  { id: '291', name: 'Microeconomía p/economistas',         prerequisites: ['542'] },
+  { id: '279', name: 'Administración financiera',           prerequisites: ['601'] },
+  { id: '603', name: 'Derecho fin., seguros y seg. social', prerequisites: ['462'] },
+  { id: '746', name: 'Computación científica actuarial',    prerequisites: ['540','542'] },
+  { id: '601', name: 'Matemática financiera y actuarial',   prerequisites: ['540','542'] },
+  { id: '752', name: 'Análisis numérico',                   prerequisites: ['544'] },
+  { id: '548', name: 'Dinero y bancos',                     prerequisites: ['279','602'] },
+  { id: '751', name: 'Estadística actuarial',               prerequisites: ['544','602'] },
+  { id: '753', name: 'Biometría actuarial',                 prerequisites: ['601','751','752'] },
+  { id: '754', name: 'Actuarial 1 – Seguros personales',    prerequisites: ['753'] },
+  { id: '755', name: 'Actuarial 2 – Seguros patrimoniales', prerequisites: ['601','751','752'] },
+  { id: '756', name: 'Actuarial 4 – Fondos, jub. y salud', prerequisites: ['754'] },
+  { id: '757', name: 'Actuarial 3 – Equilibrio actuarial',  prerequisites: ['754','755'] },
+  { id: '758', name: 'Actuarial 5 – Inv. y financiaciones', prerequisites: ['601','751'] },
+  { id: '717', name: 'Modelos y proyecciones actuariales',   prerequisites: ['757','758','746'] },
+  { id: '728', name: 'Práctica profesional del actuario',   prerequisites: ['754','755','756'] },
+  { id: 'OPT1', name: 'Optativa 1', prerequisites: [], isOpt: true },
+  { id: 'OPT2', name: 'Optativa 2', prerequisites: [], isOpt: true }
+];
+
+const graphCourses = courses.filter(c => !c.noGraph && !c.isOpt);
+const byId = {};
+courses.forEach(c => { byId[c.id] = c; });
+
+// ── Impacto ──────────────────────────────────────────────────────────────────
+const directDeps = {};
+courses.forEach(c => { directDeps[c.id] = []; });
+courses.forEach(c => (c.prerequisites || []).forEach(pr => { if (directDeps[pr]) directDeps[pr].push(c.id); }));
+
+function descendants(id) {
+  const v = new Set(), q = [id];
+  while (q.length) { const c = q.shift(); for (const d of (directDeps[c]||[])) if (!v.has(d)) { v.add(d); q.push(d); } }
+  return v;
+}
+const impact = {};
+courses.forEach(c => { impact[c.id] = descendants(c.id).size; });
+
+// ── Niveles ──────────────────────────────────────────────────────────────────
+const lvlMap = {};
+function level(id) {
+  if (lvlMap[id] !== undefined) return lvlMap[id];
+  const c = byId[id];
+  if (!c || !(c.prerequisites||[]).length) return (lvlMap[id] = 0);
+  return (lvlMap[id] = Math.max(...c.prerequisites.map(level)) + 1);
+}
+graphCourses.forEach(c => { c._lvl = level(c.id); });
+
+// Agrupar y ordenar
+const grouped = {};
+graphCourses.forEach(c => { (grouped[c._lvl] = grouped[c._lvl] || []).push(c); });
+Object.keys(grouped).forEach(l => {
+  grouped[l].sort((a,b) => a.id.localeCompare(b.id));
+  grouped[l].forEach((c,i) => { c._pos = { col: +l, row: i }; });
+});
+
+// El nivel mínimo de los nodos del grafo es 1 (CBC es nivel 0 pero no está en el grafo).
+// Desplazamos todo 1 columna a la izquierda para que arranquen en col 0.
+const colOffset = Math.min(...graphCourses.map(c => c._pos.col)); // = 1
+const maxCol    = Math.max(...graphCourses.map(c => c._pos.col)); // = 7 → desplazado a 6
+const lastGroupSize = (grouped[maxCol] || []).length;
+
+function getPos(c) {
+  const col = c._pos.col - colOffset; // shift: empieza en 0
+  const row = c._pos.row;
+  return { x: col * XS + 80, y: row * YS + 50 };
+}
+
+// OPT: misma columna que el maxCol desplazado
+const optX = (maxCol - colOffset) * XS + 80;
+
+// ── Elementos ────────────────────────────────────────────────────────────────
+const elements = [];
+
+graphCourses.forEach(c => {
+  const pos = getPos(c);
+  elements.push({ data: { id: c.id, label: c.id + '\n' + c.name, type: 'course' }, position: pos });
+  if (impact[c.id] > 0) {
+    elements.push({
+      data: { id: 'b_'+c.id, label: String(impact[c.id]), type: 'badge', forCourse: c.id },
+      classes: 'badge',
+      position: { x: pos.x + NW/2 - BS/2, y: pos.y - NH/2 + BS/2 }
+    });
+  }
+});
+
+// Optativas al final
+[{ id:'OPT1', name:'Optativa 1' }, { id:'OPT2', name:'Optativa 2' }].forEach((opt, i) => {
+  const pos = { x: optX, y: (lastGroupSize + i) * YS + 50 };
+  elements.push({ data: { id: opt.id, label: opt.id+'\n'+opt.name, type: 'course' }, position: pos });
+});
+
+// ── Estado ───────────────────────────────────────────────────────────────────
+const state = {};
+courses.forEach(c => { state[c.id] = false; });
+state['CBC'] = true; // la mayoría ya tiene el CBC hecho
+
+// ── Cytoscape ────────────────────────────────────────────────────────────────
+const cy = cytoscape({
+  container: document.getElementById('cy'),
+  elements,
+  userZoomingEnabled:  true,
+  userPanningEnabled:  false,
+  boxSelectionEnabled: false,
+  style: [
+    {
+      selector: 'node[type="course"]',
+      style: {
+        shape: 'round-rectangle', width: NW, height: NH,
+        'background-color': '#0b1220',
+        'border-color': '#18243a', 'border-width': 1.5,
+        label: 'data(label)',
+        'text-wrap': 'wrap', 'text-max-width': NW - 12,
+        'text-valign': 'center', color: '#243048',
+        'font-size': NFZ, 'font-family': 'Segoe UI, Arial, sans-serif'
       }
-      return levelMap[id];
-    }
-    courses.forEach(c => { c._level = computeLevel(c.id); });
-
-    const grouped = {};
-    courses.forEach(c => {
-      if (!grouped[c._level]) grouped[c._level] = [];
-      grouped[c._level].push(c);
-    });
-    Object.keys(grouped).forEach(level => {
-      grouped[level].sort((a,b) => a.id.localeCompare(b.id));
-    });
-
-    Object.keys(grouped).forEach(level => {
-      const group = grouped[level];
-      group.forEach((course, index) => {
-        course.pos = { x: parseInt(level), y: index };
-      });
-    });
-
-    const nodes = courses.map(c => {
-      // Utilizamos el mismo sistema de coordenadas tanto en escritorio como en móvil (horizontal)
-      return {
-        data: {
-          id: c.id,
-          label: c.id + '\n' + c.name
-        },
-        position: {
-          x: c.pos.x * xSpacing + 100,
-          y: c.pos.y * ySpacing + 60
-        }
-      };
-    });
-
-    const edges = [];
-
-    const cy = cytoscape({
-      container: document.getElementById('cy'),
-      elements: { nodes: nodes, edges: edges },
-      // Permitir zoom para que el usuario ajuste el tamaño según sus preferencias
-      userZoomingEnabled: true,
-      // Panning se activará más adelante dependiendo del dispositivo
-      userPanningEnabled: false,
-      boxSelectionEnabled: false,
-      style: [
-        {
-          selector: 'node',
-          style: {
-            'shape': 'round-rectangle',
-            'width': nodeWidth,
-            'height': nodeHeight,
-            'background-color': '#ffffff',
-            'border-color': '#333333',
-            'border-width': 2,
-            'label': 'data(label)',
-            'text-wrap': 'wrap',
-            'text-max-width': nodeWidth - 20,
-            'text-valign': 'center',
-            'color': '#333333',
-            'font-size': nodeFontSize
-          }
-        },
-        {
-          selector: '.completed',
-          style: {
-            'background-color': '#4caf50',
-            'border-color': '#388e3c',
-            'color': '#ffffff'
-          }
-        },
-        {
-          selector: '.available',
-          style: {
-            'background-color': '#2196f3',
-            'border-color': '#1976d2',
-            'color': '#ffffff'
-          }
-        },
-        {
-          selector: '.locked',
-          style: {
-            'background-color': '#9e9e9e',
-            'border-color': '#616161',
-            'color': '#ffffff'
-          }
-        }
-      ],
-      layout: { name: 'preset' }
-    });
-
-    // Bloquear los nodos para que no se puedan arrastrar ni mover
-    cy.nodes().ungrabify();
-
-    // Permitir desplazamiento del grafo en todos los dispositivos para que se puedan descubrir columnas fuera de la vista inicial
-    cy.userPanningEnabled(true);
-
-    function updateStatuses() {
-      let completedCount = 0;
-      courses.forEach(course => {
-        const node = cy.getElementById(course.id);
-        node.removeClass('completed');
-        node.removeClass('available');
-        node.removeClass('locked');
-        if (courseState[course.id]) {
-          node.addClass('completed');
-          completedCount++;
-        } else {
-          const allDone = course.prerequisites.every(pr => courseState[pr]);
-          if (allDone) {
-            node.addClass('available');
-          } else {
-            node.addClass('locked');
-          }
-        }
-      });
-      const percentage = Math.round((completedCount / courses.length) * 100);
-      document.getElementById('progress-bar').style.width = percentage + '%';
-      document.getElementById('progress-text').textContent = percentage + '% completado';
-    }
-
-    updateStatuses();
-
-    // Ajustar el diagrama según el dispositivo.
-    // En todos los dispositivos utilizamos cy.fit() para calcular un encuadre inicial.
-    // Para móviles aplicamos un zoom adicional para mejorar la legibilidad,
-    // pero el usuario siempre puede acercar o alejar con gestos de zoom.
-    function applyInitialView() {
-      // Encajamos todos los elementos con un poco de margen
-      cy.fit(cy.elements(), 60);
-      if (isMobile) {
-        // Aumentamos la escala para que el grafo se vea más grande en móviles
-        const factor = 1.8;
-        cy.zoom({ level: cy.zoom() * factor, position: { x: 0, y: 0 } });
-        // Desplazamos ligeramente el grafo hacia la derecha para que el primer nivel no quede demasiado pegado al borde
-        cy.pan({ x: 20, y: 0 });
+    },
+    {
+      selector: '.completed',
+      style: {
+        'background-color': '#071810', 'border-color': '#4ade80', 'border-width': 2,
+        color: '#4ade80',
+        'shadow-blur': 14, 'shadow-color': '#22c55e',
+        'shadow-offset-x': 0, 'shadow-offset-y': 0, 'shadow-opacity': 0.38
+      }
+    },
+    {
+      selector: '.available',
+      style: {
+        'background-color': '#070f22', 'border-color': '#60a5fa', 'border-width': 2,
+        color: '#7dc3fb',
+        'shadow-blur': 16, 'shadow-color': '#3b82f6',
+        'shadow-offset-x': 0, 'shadow-offset-y': 0, 'shadow-opacity': 0.42
+      }
+    },
+    {
+      selector: '.locked',
+      style: {
+        'background-color': '#090f1c', 'border-color': '#121c2e', 'border-width': 1,
+        color: '#1a2535'
+      }
+    },
+    {
+      selector: '.badge',
+      style: {
+        shape: 'ellipse', width: BS, height: BS,
+        'background-color': '#ca8a04',
+        'border-width': 1.5, 'border-color': '#060a16',
+        label: 'data(label)',
+        color: '#000', 'font-size': BFZ, 'font-weight': 'bold',
+        'text-valign': 'center', 'text-halign': 'center', 'z-index': 999,
+        'shadow-blur': 8, 'shadow-color': '#fbbf24',
+        'shadow-offset-x': 0, 'shadow-offset-y': 0, 'shadow-opacity': 0.55
       }
     }
+  ],
+  layout: { name: 'preset' }
+});
 
-    applyInitialView();
-    // Volvemos a calcular la vista cuando la ventana cambia de tamaño
-    window.addEventListener('resize', applyInitialView);
+cy.nodes().ungrabify();
 
-    cy.on('tap', 'node', function(evt) {
-      const id = evt.target.id();
-      if (evt.target.hasClass('available') || evt.target.hasClass('completed')) {
-        courseState[id] = !courseState[id];
-        updateStatuses();
-        // Ya no reajustamos la cámara al hacer clic, para evitar saltos incómodos
-      }
-    });
-  </script>
+// ── Vista inicial: centrado horizontal, pegado al top ────────────────────────
+function applyView() {
+  const bb  = cy.elements().boundingBox();
+  const cw  = cy.width();
+  const ch  = cy.height();
+  const pad = 22;
+  const zoom = Math.min((cw - pad*2) / bb.w, (ch - pad*2) / bb.h, 3);
+  const z = Math.max(zoom, 0.05);
+  // Horizontal: centrado. Vertical: pegado arriba con padding mínimo.
+  cy.zoom(z);
+  cy.pan({
+    x: pad + (cw - pad*2 - bb.w * z) / 2 - bb.x1 * z,
+    y: pad - bb.y1 * z
+  });
+}
+applyView();
+window.addEventListener('resize', applyView);
+
+// ── Actualizar estados ───────────────────────────────────────────────────────
+function update() {
+  let done = 0;
+  courses.forEach(c => {
+    if (c.noGraph) { if (state[c.id]) done++; return; }
+    const n = cy.getElementById(c.id);
+    if (!n || !n.length) { if (state[c.id]) done++; return; }
+    n.removeClass('completed available locked');
+    if (state[c.id]) { n.addClass('completed'); done++; }
+    else n.addClass((c.prerequisites||[]).every(p => state[p]) ? 'available' : 'locked');
+  });
+  const pct = Math.round(done / courses.length * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = pct + '% completado';
+}
+update();
+
+// ── CBC toggle ───────────────────────────────────────────────────────────────
+function toggleCBC() {
+  state['CBC'] = !state['CBC'];
+  const btn = document.getElementById('cbc-btn');
+  const icon = document.getElementById('cbc-icon');
+  if (state['CBC']) { btn.classList.add('done'); icon.textContent = '✓'; }
+  else              { btn.classList.remove('done'); icon.textContent = '○'; }
+  update();
+}
+
+// ── Tap ──────────────────────────────────────────────────────────────────────
+cy.on('tap', 'node', evt => {
+  let id = evt.target.id();
+  if (evt.target.data('type') === 'badge') id = evt.target.data('forCourse');
+  const n = cy.getElementById(id);
+  if (n.hasClass('available') || n.hasClass('completed')) {
+    state[id] = !state[id];
+    update();
+  }
+});
+</script>
 </body>
 </html>
