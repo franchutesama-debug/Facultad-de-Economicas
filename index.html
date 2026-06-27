@@ -803,31 +803,13 @@ function sendFeedback(e){
   var name=document.getElementById('fb-name').value.trim();
   var msg=document.getElementById('fb-msg').value.trim();
   if(!msg){alert('Escribí tu sugerencia antes de enviar.');return;}
-  var btn=document.getElementById('fb-send');
+  var subject=encodeURIComponent('Sugerencia – FCE UBA Correlatividades');
+  var body=encodeURIComponent('Nombre: '+(name||'Anónimo')+'\n\nMensaje:\n'+msg);
+  window.open('mailto:franciscosamacoits@gmail.com?subject='+subject+'&body='+body,'_blank');
   var res=document.getElementById('fb-result');
-  btn.disabled=true;btn.textContent='Enviando...';res.textContent='';
-  fetch('https://formsubmit.co/ajax/franciscosamacoits@gmail.com',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Accept':'application/json'},
-    body:JSON.stringify({name:name||'Anónimo',message:msg,_subject:'Sugerencia – FCE UBA Correlatividades',_captcha:'false'})
-  })
-  .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d};});})
-  .then(function(r){
-    if(r.ok&&r.data.success==='true'){
-      res.style.color='#4ade80';res.textContent='¡Gracias! Tu sugerencia fue enviada ✓';
-      btn.textContent='Enviado ✓';
-    } else {
-      throw new Error('fail');
-    }
-  })
-  .catch(function(){
-    // Fallback: abrir cliente de mail
-    var body=encodeURIComponent('Nombre: '+(name||'Anónimo')+'\n\nMensaje:\n'+msg);
-    window.location.href='mailto:franciscosamacoits@gmail.com?subject=Sugerencia%20%E2%80%93%20FCE%20UBA%20Correlatividades&body='+body;
-    res.style.color='#ca8a04';
-    res.textContent='Se abrió tu cliente de mail como alternativa.';
-    btn.disabled=false;btn.textContent='Enviar';
-  });
+  res.style.color='#4ade80';
+  res.textContent='Se abrió tu cliente de mail con el mensaje listo ✓';
+  document.getElementById('fb-send').textContent='Enviado ✓';
 }
 
 // ============================================================
