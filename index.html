@@ -27,7 +27,7 @@
     /* APP */
     #app { position: fixed; inset: 0; display: flex; flex-direction: column; }
     #app.hidden { display: none; }
-    #header { position: relative; z-index: 2; padding: 7px 14px 5px; background: rgba(6,10,22,.92); backdrop-filter: blur(8px); border-bottom: 1px solid #18233a; flex-shrink: 0; }
+    #header { position: relative; z-index: 20; padding: 7px 14px 5px; background: rgba(6,10,22,.92); backdrop-filter: blur(8px); border-bottom: 1px solid #18233a; flex-shrink: 0; }
     #htop { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
     #career-lbl { font-size: 13px; color: #5a7090; font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #user-badge { font-size: 11px; color: #60a5fa; white-space: nowrap; font-weight: 600; cursor: pointer; }
@@ -45,9 +45,9 @@
     .lb { width: 11px; height: 11px; border-radius: 50%; background: #ca8a04; flex-shrink: 0; }
     #near-info { font-size: 10px; color: #ca8a04; text-align: center; padding-top: 3px; display: none; font-weight: 600; }
     #near-info.on { display: block; }
-    #cy { position: relative; z-index: 1; width: 100%; flex: 1; background: transparent; touch-action: none; }
+    #cy { position: relative; z-index: 1; width: 100%; flex: 1; background: transparent; touch-action: none; overflow: hidden; isolation: isolate; }
     /* BOTTOM PANEL */
-    #bpanel { position: relative; z-index: 2; background: rgba(6,10,22,.92); backdrop-filter: blur(8px); border-top: 1px solid #18233a; padding: 6px 12px; flex-shrink: 0; }
+    #bpanel { position: relative; z-index: 20; background: rgba(6,10,22,.92); backdrop-filter: blur(8px); border-top: 1px solid #18233a; padding: 6px 12px; flex-shrink: 0; }
     #brow1 { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
     #bprog-wrap { flex: 1; height: 10px; border-radius: 5px; background: #0a0f1e; position: relative; border: 1px solid #1a2540; min-width: 0; overflow: hidden; }
     #bprog-bar { height: 100%; width: 0%; background: linear-gradient(90deg,#166534,#22c55e); border-radius: 5px; transition: width .4s ease; }
@@ -207,7 +207,7 @@
 <div id="cbc-overlay" class="overlay hidden">
   <div class="modal-box">
     <div id="cbc-title">Ciclo B&aacute;sico / General</div>
-    <div id="cbc-sub">Marcá las aprobadas con nota. Todas las notas cuentan en el promedio.</div>
+    <div id="cbc-sub">Vienen todas aprobadas por defecto. Destildá las que no tenés, y agregá las notas para el promedio.</div>
     <div id="cbc-list"></div>
     <button id="cbc-save" onclick="saveCBC()">Guardar</button>
     <button id="cbc-close-btn" onclick="closeCBCModal()">Cerrar</button>
@@ -616,6 +616,14 @@ function selectCareer(key){
   else{var saved=lsGet('legajo');currentLegajo=saved||'invitado';}
   currentCareer=key;lsSet('career',key);
   courseState=lsGet(stateKey(key))||{};
+  // Pre-aprobar CBC si es la primera vez (sin estado guardado)
+  var isNew=!lsGet(stateKey(key));
+  if(isNew&&CBC_COURSES[key]){
+    CBC_COURSES[key].forEach(function(c){
+      if(!courseState[c.id])courseState[c.id]={approved:true,grade:null,history:[]};
+    });
+    lsSet(stateKey(key),courseState);
+  }
   document.getElementById('selector').style.display='none';
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('career-lbl').textContent=CAREERS[key].label;
