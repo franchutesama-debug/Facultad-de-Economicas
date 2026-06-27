@@ -698,6 +698,8 @@ function doRegistrar(pass){
   if(!modalId||!currentCareer)return;
   var raw=parseFloat(document.getElementById('mgrade').value);
   if(isNaN(raw)||raw<1||raw>10){alert('Nota entre 1 y 10');return;}
+  if(pass&&raw<4){alert('Para aprobar la nota tiene que ser 4 o mayor.');return;}
+  if(!pass&&raw>3){alert('Para desaprobar la nota tiene que ser 3 o menor (1, 2 o 3).');return;}
   var st=courseState[modalId]||{approved:false,grade:null,history:[]};
   var hist=(st.history||[]).slice();hist.push({g:raw,pass:pass});
   courseState[modalId]={approved:pass,grade:pass?raw:null,history:hist};
@@ -766,6 +768,8 @@ function renderElectivasList(){
 function doRegistrarE(eid,inp,pass){
   var raw=parseFloat(inp.value);
   if(isNaN(raw)||raw<1||raw>10){alert('Nota entre 1 y 10');return;}
+  if(pass&&raw<4){alert('Para aprobar la nota tiene que ser 4 o mayor.');return;}
+  if(!pass&&raw>3){alert('Para desaprobar la nota tiene que ser 3 o menor (1, 2 o 3).');return;}
   var st=courseState[eid]||{approved:false,grade:null,history:[]};
   var hist=(st.history||[]).slice();hist.push({g:raw,pass:pass});
   courseState[eid]={approved:pass,grade:pass?raw:null,history:hist};
