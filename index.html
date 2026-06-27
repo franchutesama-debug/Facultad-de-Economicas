@@ -124,7 +124,7 @@
     <div class="li"><span class="ld" style="background:#0b1220;border:1px solid #1a2535"></span>Bloqueada</div>
     <div class="li"><span class="lb"></span>Materias que abre</div>
   </div>
-  <div id="hint">Tocá un nodo disponible para marcarlo · Pellizca para zoom</div>
+  <div id="hint">Tocá para marcar · Deslizá para explorar → · Pellizca para zoom</div>
 </div>
 
 <div id="cy"></div>
@@ -156,13 +156,13 @@ for (let i = 0; i < 62; i++) {
 
 // ── Config ───────────────────────────────────────────────────────────────────
 const isMobile = window.innerWidth <= 768;
-const NW  = isMobile ? 138 : 200;   // node width
-const NH  = isMobile ? 62  : 80;    // node height
-const NFZ = isMobile ? 10  : 13;    // node font size
-const XS  = isMobile ? 160 : 240;   // x spacing (más compacto en desktop)
-const YS  = isMobile ? 80  : 98;    // y spacing
-const BS  = isMobile ? 20  : 24;    // badge size
-const BFZ = isMobile ? 9   : 11;    // badge font size
+const NW  = isMobile ? 158 : 200;   // node width
+const NH  = isMobile ? 70  : 80;    // node height
+const NFZ = isMobile ? 11  : 13;    // node font size
+const XS  = isMobile ? 182 : 240;   // x spacing
+const YS  = isMobile ? 88  : 98;    // y spacing
+const BS  = isMobile ? 22  : 24;    // badge size
+const BFZ = isMobile ? 10  : 11;    // badge font size
 
 // ── Materias ─────────────────────────────────────────────────────────────────
 // CBC vive en el estado pero NO es un nodo del grafo.
@@ -279,7 +279,7 @@ const cy = cytoscape({
   container: document.getElementById('cy'),
   elements,
   userZoomingEnabled:  true,
-  userPanningEnabled:  false,
+  userPanningEnabled:  isMobile,   // en móvil se puede deslizar
   boxSelectionEnabled: false,
   style: [
     {
@@ -338,20 +338,28 @@ const cy = cytoscape({
 
 cy.nodes().ungrabify();
 
-// ── Vista inicial: centrado horizontal, pegado al top ────────────────────────
+// ── Vista inicial ────────────────────────────────────────────────────────────
 function applyView() {
   const bb  = cy.elements().boundingBox();
   const cw  = cy.width();
   const ch  = cy.height();
-  const pad = 22;
-  const zoom = Math.min((cw - pad*2) / bb.w, (ch - pad*2) / bb.h, 3);
-  const z = Math.max(zoom, 0.05);
-  // Horizontal: centrado. Vertical: pegado arriba con padding mínimo.
-  cy.zoom(z);
-  cy.pan({
-    x: pad + (cw - pad*2 - bb.w * z) / 2 - bb.x1 * z,
-    y: pad - bb.y1 * z
-  });
+  const pad = 20;
+
+  if (isMobile) {
+    // Móvil: zoom para que los nodos se lean bien, arranca desde la izquierda
+    const z = Math.min((ch - pad*2) / bb.h, 0.88);
+    cy.zoom(Math.max(z, 0.3));
+    cy.pan({ x: pad - bb.x1 * cy.zoom(), y: pad - bb.y1 * cy.zoom() });
+  } else {
+    // Desktop: encaja todo en pantalla
+    const zoom = Math.min((cw - pad*2) / bb.w, (ch - pad*2) / bb.h, 3);
+    const z = Math.max(zoom, 0.05);
+    cy.zoom(z);
+    cy.pan({
+      x: pad + (cw - pad*2 - bb.w * z) / 2 - bb.x1 * z,
+      y: pad - bb.y1 * z
+    });
+  }
 }
 applyView();
 window.addEventListener('resize', applyView);
