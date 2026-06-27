@@ -94,6 +94,7 @@
       position: relative; z-index: 1;
       width: 100%; height: calc(100vh - 96px);
       background: transparent;
+      touch-action: none;   /* el pellizco lo maneja Cytoscape, no el browser */
     }
 
     @media (max-width: 480px) {
@@ -279,7 +280,9 @@ const cy = cytoscape({
   container: document.getElementById('cy'),
   elements,
   userZoomingEnabled:  true,
-  userPanningEnabled:  isMobile,   // en móvil se puede deslizar
+  userPanningEnabled:  isMobile,
+  minZoom: 0.1,
+  maxZoom: 4,
   boxSelectionEnabled: false,
   style: [
     {
