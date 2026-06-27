@@ -10,6 +10,8 @@
     body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(145deg, #060a16 0%, #0b1124 50%, #090f1e 100%); min-height: 100vh; color: #c0d0ec; overflow: hidden; }
     #math-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
     .ms { position: absolute; font-family: 'Times New Roman', Georgia, serif; color: #162033; user-select: none; pointer-events: none; line-height: 1; }
+
+    /* CAREER SELECTOR */
     #selector { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; overflow-y: auto; }
     #selector h1 { font-size: 21px; color: #c0d0ec; text-align: center; margin-bottom: 4px; font-weight: 800; }
     #selector .sub { font-size: 12px; color: #3a5070; text-align: center; margin-bottom: 22px; }
@@ -23,6 +25,8 @@
     .ccard .ccode { font-size: 26px; font-weight: 900; color: #60a5fa; margin-bottom: 7px; font-family: 'Times New Roman', serif; }
     .ccard .cname { font-size: 12px; color: #c0d0ec; font-weight: 600; line-height: 1.3; }
     .ccard .cdur  { font-size: 10px; color: #3a5070; margin-top: 4px; }
+
+    /* APP */
     #app { position: fixed; inset: 0; display: flex; flex-direction: column; }
     #app.hidden { display: none; }
     #header { position: relative; z-index: 2; padding: 7px 14px 5px; background: rgba(6,10,22,.92); backdrop-filter: blur(8px); border-bottom: 1px solid #18233a; flex-shrink: 0; }
@@ -30,9 +34,13 @@
     #career-lbl { font-size: 13px; color: #5a7090; font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #user-badge { font-size: 11px; color: #2a3850; white-space: nowrap; }
     #hrow { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-    #prog-wrap { flex: 1; height: 14px; border-radius: 8px; background: #0d1628; position: relative; border: 1px solid #1a2540; min-width: 0; }
-    #prog-bar { height: 100%; width: 0; background: linear-gradient(90deg,#16a34a,#4ade80); border-radius: 8px; transition: width .35s ease; }
-    #prog-txt { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); font-size: 9px; color: #2a3850; font-weight: 700; white-space: nowrap; }
+
+    /* PROGRESS BAR */
+    #prog-wrap { flex: 1; height: 18px; border-radius: 9px; background: #0a0f1e; position: relative; border: 1px solid #1a2540; min-width: 0; overflow: hidden; }
+    #prog-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #166534, #22c55e); border-radius: 9px; transition: width .4s ease; position: relative; }
+    #prog-bar::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg,rgba(255,255,255,.15) 0%,transparent 60%); border-radius: inherit; }
+    #prog-txt { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); font-size: 10px; color: rgba(255,255,255,.7); font-weight: 700; white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,.8); pointer-events: none; }
+
     #cbc-btn { flex-shrink: 0; padding: 3px 10px; border-radius: 20px; border: 1.5px solid #1e2e48; background: #0d1425; color: #2e4060; cursor: pointer; font-size: 11px; font-family: inherit; transition: all .2s; white-space: nowrap; }
     #cbc-btn.done { border-color: #4ade80; background: #071a10; color: #4ade80; }
     #legend { display: flex; justify-content: center; gap: 12px; font-size: 9px; flex-wrap: wrap; color: #3a5070; padding-bottom: 2px; }
@@ -42,6 +50,8 @@
     #near-info { font-size: 10px; color: #ca8a04; text-align: center; padding-top: 3px; display: none; font-weight: 600; }
     #near-info.on { display: block; }
     #cy { position: relative; z-index: 1; width: 100%; flex: 1; background: transparent; touch-action: none; }
+
+    /* BOTTOM PANEL */
     #bpanel { position: relative; z-index: 2; background: rgba(6,10,22,.92); backdrop-filter: blur(8px); border-top: 1px solid #18233a; padding: 7px 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex-shrink: 0; }
     .bstat { font-size: 11px; color: #3a5070; white-space: nowrap; }
     .bval  { color: #c0d0ec; font-weight: 700; }
@@ -49,33 +59,55 @@
     .bbtn { padding: 4px 10px; border-radius: 20px; border: 1px solid #18233a; background: #0d1425; color: #3a5070; cursor: pointer; font-size: 10px; font-family: inherit; transition: all .2s; white-space: nowrap; }
     .bbtn:hover { border-color: #60a5fa; color: #60a5fa; }
     #spacer { flex: 1; }
-    #moverlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.72); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; }
-    #moverlay.hidden { display: none; }
-    #mbox { background: #0b1220; border: 1.5px solid #18233a; border-radius: 16px; padding: 22px 20px; width: 100%; max-width: 360px; max-height: 82vh; overflow-y: auto; }
+
+    /* SHARED OVERLAY */
+    .overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.72); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .overlay.hidden { display: none; }
+    .modal-box { background: #0b1220; border: 1.5px solid #18233a; border-radius: 16px; padding: 22px 20px; width: 100%; max-width: 380px; max-height: 85vh; overflow-y: auto; }
+
+    /* COURSE MODAL */
     #mcode  { font-size: 11px; color: #2a3850; margin-bottom: 3px; }
     #mname  { font-size: 17px; font-weight: 800; color: #c0d0ec; margin-bottom: 12px; line-height: 1.3; }
-    #mstatus { font-size: 12px; padding: 7px 10px 7px 12px; border-radius: 8px; background: #0d1628; border-left: 3px solid #1a2535; margin-bottom: 14px; color: #3a5070; }
+    #mstatus { font-size: 12px; padding: 7px 10px 7px 12px; border-radius: 8px; margin-bottom: 14px; }
+    .status-approved { background: #071a10; border-left: 3px solid #4ade80; color: #4ade80; }
+    .status-avail    { background: #071828; border-left: 3px solid #60a5fa; color: #60a5fa; }
+    .status-locked   { background: #0d1628; border-left: 3px solid #1a2535; color: #3a5070; }
     .msec { margin-bottom: 14px; }
     .mlbl { font-size: 11px; color: #2a3850; margin-bottom: 5px; }
-    #mgrade-row { display: flex; gap: 8px; align-items: center; }
-    #mgrade { width: 78px; padding: 8px 10px; border-radius: 8px; text-align: center; background: #0d1425; border: 1.5px solid #18233a; color: #c0d0ec; font-size: 16px; font-family: inherit; outline: none; }
-    #mgrade:focus { border-color: #60a5fa; }
-    #mapprove { flex: 1; padding: 9px; border-radius: 9px; border: 1.5px solid #18233a; background: #0d1425; color: #3a5070; cursor: pointer; font-size: 13px; font-family: inherit; font-weight: 700; transition: all .2s; }
-    #mapprove.approved { border-color: #4ade80; background: #071a10; color: #4ade80; }
-    #mapprove.avail    { border-color: #60a5fa; background: #071828; color: #60a5fa; }
+    .grade-inp { width: 78px; padding: 8px 10px; border-radius: 8px; text-align: center; background: #0d1425; border: 1.5px solid #18233a; color: #c0d0ec; font-size: 16px; font-family: inherit; outline: none; }
+    .grade-inp:focus { border-color: #60a5fa; }
+    .grade-row { display: flex; gap: 8px; align-items: center; }
+    .btn-blue { flex: 1; padding: 9px; border-radius: 9px; border: 1.5px solid #60a5fa; background: #071828; color: #60a5fa; cursor: pointer; font-size: 13px; font-family: inherit; font-weight: 700; }
+    .btn-red  { width: 100%; padding: 8px; border-radius: 9px; border: 1px solid #2a1010; background: #120808; color: #a05050; cursor: pointer; font-size: 12px; font-family: inherit; margin-top: 8px; }
     #mhist { list-style: none; }
     #mhist li { font-size: 12px; padding: 5px 0; border-bottom: 1px solid #0e1525; display: flex; justify-content: space-between; align-items: center; color: #5a7090; }
-    #mhist li:last-child { border-bottom: none; color: #c0d0ec; }
+    #mhist li:last-child { border-bottom: none; }
     .mnote { font-size: 10px; color: #2a3850; }
-    #munapprove { display: none; width: 100%; padding: 8px; border-radius: 9px; border: 1px solid #2a1010; background: #120808; color: #a05050; cursor: pointer; font-size: 12px; font-family: inherit; margin-top: 8px; }
+    .grade-badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-weight: 700; font-size: 12px; }
+    .grade-pass { background: #071a10; color: #4ade80; }
+    .grade-fail { background: #1a0808; color: #f87171; }
     #mclose { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #18233a; background: #0d1628; color: #3a5070; cursor: pointer; font-size: 13px; font-family: inherit; margin-top: 14px; transition: all .2s; }
     #mclose:hover { color: #c0d0ec; border-color: #3a5070; }
+
+    /* CBC MODAL */
+    #cbc-title { font-size: 16px; font-weight: 800; color: #c0d0ec; margin-bottom: 3px; }
+    #cbc-sub   { font-size: 11px; color: #3a5070; margin-bottom: 16px; }
+    .cbc-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid #0e1525; }
+    .cbc-row:last-of-type { border-bottom: none; }
+    .cbc-check { width: 17px; height: 17px; cursor: pointer; accent-color: #4ade80; flex-shrink: 0; }
+    .cbc-name { flex: 1; font-size: 12px; color: #8098be; }
+    .cbc-g { width: 62px; padding: 5px 7px; border-radius: 6px; background: #0d1425; border: 1px solid #18233a; color: #c0d0ec; font-size: 13px; text-align: center; font-family: inherit; outline: none; }
+    .cbc-g:focus { border-color: #60a5fa; }
+    #cbc-save { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #4ade80; background: #071a10; color: #4ade80; cursor: pointer; font-size: 13px; font-family: inherit; margin-top: 16px; font-weight: 700; }
+    #cbc-close-btn { width: 100%; padding: 9px; border-radius: 10px; border: 1px solid #18233a; background: #0d1628; color: #3a5070; cursor: pointer; font-size: 12px; font-family: inherit; margin-top: 8px; }
+
     @media (max-width: 480px) { .career-grid { gap: 10px; } .ccard { padding: 14px 10px; } .ccard .ccode { font-size: 22px; } #bpanel { gap: 5px; } }
   </style>
 </head>
 <body>
 <div id="math-bg" aria-hidden="true"></div>
 
+<!-- CAREER SELECTOR -->
 <div id="selector">
   <h1>FCE UBA &middot; Correlatividades</h1>
   <p class="sub">Ingresa tu legajo y elige tu carrera</p>
@@ -91,12 +123,16 @@
   </div>
 </div>
 
+<!-- MAIN APP -->
 <div id="app" class="hidden">
   <div id="header">
-    <div id="htop"><span id="career-lbl">Actuario</span><span id="user-badge"></span></div>
+    <div id="htop"><span id="career-lbl">Carrera</span><span id="user-badge"></span></div>
     <div id="hrow">
-      <div id="prog-wrap"><div id="prog-bar"></div><span id="prog-txt">0% completado</span></div>
-      <button id="cbc-btn" onclick="toggleCBC()">CBC</button>
+      <div id="prog-wrap">
+        <div id="prog-bar"></div>
+        <span id="prog-txt">0%</span>
+      </div>
+      <button id="cbc-btn" onclick="openCBCModal()">CBC</button>
     </div>
     <div id="legend">
       <div class="li"><span class="ld" style="background:#0a2518;border:1.5px solid #4ade80"></span>Aprobada</div>
@@ -112,7 +148,7 @@
     <span class="bsep">|</span>
     <div class="bstat">Promedio: <span class="bval" id="bavg">-</span></div>
     <span class="bsep">|</span>
-    <div class="bstat"><span class="bval" id="bdone">0</span>/<span class="bval" id="btotal">0</span></div>
+    <div class="bstat"><span class="bval" id="bdone">0</span>/<span class="bval" id="btotal">0</span> mat.</div>
     <span id="spacer"></span>
     <button class="bbtn" id="opt-btn" onclick="toggleOpt()">Ocultar optativas</button>
     <button class="bbtn" onclick="resetView()">Vista</button>
@@ -120,174 +156,247 @@
   </div>
 </div>
 
-<div id="moverlay" class="hidden">
-  <div id="mbox">
+<!-- COURSE MODAL -->
+<div id="moverlay" class="overlay hidden">
+  <div class="modal-box">
     <div id="mcode"></div>
     <div id="mname">Materia</div>
     <div id="mstatus"></div>
-    <div class="msec">
-      <div class="mlbl">Nota (4-10):</div>
-      <div id="mgrade-row">
-        <input type="number" id="mgrade" min="4" max="10" step="0.5" placeholder="-" />
-        <button id="mapprove" onclick="doApprove()">Marcar aprobada</button>
-      </div>
-    </div>
-    <div class="msec">
+
+    <!-- Historial de cursadas -->
+    <div class="msec" id="hist-sec" style="display:none">
       <div class="mlbl">Historial de cursadas:</div>
       <ul id="mhist"></ul>
     </div>
-    <button id="munapprove" onclick="doUnapprove()">Desmarcar como aprobada</button>
+
+    <!-- Registrar nueva cursada -->
+    <div class="msec" id="register-sec" style="display:none">
+      <div class="mlbl" id="register-lbl">Registrar cursada:</div>
+      <div class="grade-row">
+        <input type="number" class="grade-inp" id="mgrade" min="1" max="10" step="0.5" placeholder="1–10" />
+        <button class="btn-blue" id="mregister" onclick="doRegistrar()">Registrar</button>
+      </div>
+      <div style="font-size:10px;color:#2a3850;margin-top:5px">Nota &ge;4 = aprobada. Nota &lt;4 = desaprobada (recursada).</div>
+    </div>
+
+    <button class="btn-red" id="munapprove" style="display:none" onclick="doUnapprove()">Desmarcar como aprobada</button>
     <button id="mclose" onclick="closeModal()">Cerrar</button>
   </div>
 </div>
 
+<!-- CBC MODAL -->
+<div id="cbc-overlay" class="overlay hidden">
+  <div class="modal-box">
+    <div id="cbc-title">Ciclo Basico / General</div>
+    <div id="cbc-sub">Marca cada materia con su nota. El promedio incluye estas notas.</div>
+    <div id="cbc-list"></div>
+    <button id="cbc-save" onclick="saveCBC()">Guardar</button>
+    <button id="cbc-close-btn" onclick="closeCBCModal()">Cerrar</button>
+  </div>
+</div>
+
 <script>
+// Math background
 (function(){
-  var SYM=['Sum','E[X]','Var(X)','sigma^2','mu','lambda','Phi','alpha','beta','gamma','delta','theta','rho','omega','pi','infty','F(x)','P(A|B)','L(theta)','E[T]','det(A)','n!'];
+  var SYM=['Sum','E[X]','Var(X)','sigma^2','mu','lambda','Phi','alpha','beta','gamma','delta','theta','pi','infty','F(x)','P(A|B)','L(theta)','E[T]','det(A)','n!','Cov','Bernoulli'];
   var bg=document.getElementById('math-bg');
-  for(var i=0;i<48;i++){
+  for(var i=0;i<50;i++){
     var s=document.createElement('span');s.className='ms';
     s.textContent=SYM[i%SYM.length];
     s.style.left=(Math.random()*96).toFixed(1)+'%';
     s.style.top=(Math.random()*96).toFixed(1)+'%';
     s.style.fontSize=(12+Math.random()*42).toFixed(0)+'px';
-    s.style.opacity=(.38+Math.random()*.55).toFixed(2);
+    s.style.opacity=(.35+Math.random()*.55).toFixed(2);
     s.style.transform='rotate('+((Math.random()-.5)*56).toFixed(1)+'deg)';
     bg.appendChild(s);
   }
 })();
 
+// ============================
+// CBC COURSES PER CAREER
+// ============================
+var CBC_COURSES = {
+  actuario: [
+    {id:'cbc1', name:'Analisis Matematico I'},
+    {id:'cbc2', name:'Economia General'},
+    {id:'cbc3', name:'Sociologia'},
+    {id:'cbc4', name:'Metodologia de las Cs. Sociales'},
+    {id:'cbc5', name:'Algebra'},
+    {id:'cbc6', name:'Historia Econ. y Social General'}
+  ],
+  contador: [
+    {id:'cbc_241', name:'Analisis Matematico I'},
+    {id:'cbc_242', name:'Economia'},
+    {id:'cbc_243', name:'Sociologia'},
+    {id:'cbc_244', name:'Metodologia de las Cs. Sociales'},
+    {id:'cbc_245', name:'Algebra'},
+    {id:'cbc_246', name:'Historia Econ. y Social General'}
+  ],
+  administracion: [
+    {id:'cbc_241', name:'Analisis Matematico I'},
+    {id:'cbc_242', name:'Economia'},
+    {id:'cbc_245', name:'Algebra'},
+    {id:'cbc_246', name:'Historia Econ. y Social General'},
+    {id:'cbc_252', name:'Administracion General'},
+    {id:'cbc_254', name:'Sociologia de las Organizaciones'}
+  ],
+  economia: [
+    {id:'cbc_241', name:'Analisis Matematico I'},
+    {id:'cbc_242', name:'Economia'},
+    {id:'cbc_245', name:'Algebra'},
+    {id:'cbc_246', name:'Historia Econ. y Social General'},
+    {id:'cbc_255', name:'Analisis Contable'},
+    {id:'cbc_256', name:'Inst. de Gobierno y Ec. Politica'}
+  ]
+};
+
+// ============================
+// CAREER DATA
+// ============================
 var CAREERS = {
   actuario: {
     label: 'Actuario', cbcLabel: 'CBC',
     courses: [
-      {id:'540', name:'Analisis Estadistico I',        prereqs:['CBC']},
-      {id:'542', name:'Matematica Aplicada I',          prereqs:['CBC']},
-      {id:'262', name:'Macroeconomia',                  prereqs:['CBC']},
-      {id:'274', name:'Sistemas Administrativos',       prereqs:['CBC']},
-      {id:'462', name:'Derecho Empresarial',            prereqs:['CBC']},
-      {id:'602', name:'Analisis Estadistico II',        prereqs:['540','542']},
-      {id:'544', name:'Matematica Aplicada II',         prereqs:['542']},
-      {id:'291', name:'Microeconomia',                  prereqs:['542']},
-      {id:'601', name:'Matematica Fin. y Actuarial',    prereqs:['540','542']},
-      {id:'746', name:'Computacion Cientifica Act.',    prereqs:['540','542']},
-      {id:'279', name:'Administracion Financiera',      prereqs:['601']},
-      {id:'603', name:'Der. Fin., Seguros y Seg. Soc.',prereqs:['462']},
-      {id:'752', name:'Analisis Numerico',              prereqs:['544']},
-      {id:'751', name:'Estadistica Actuarial',          prereqs:['544','602']},
-      {id:'548', name:'Dinero y Bancos',                prereqs:['279','602']},
-      {id:'753', name:'Biometria Actuarial',            prereqs:['601','751','752']},
-      {id:'755', name:'Actuarial 2 - Seg. Patrimoniales',prereqs:['601','751','752']},
-      {id:'758', name:'Actuarial 5 - Inv. y Financ.',  prereqs:['601','751']},
-      {id:'754', name:'Actuarial 1 - Seg. Personales', prereqs:['753']},
-      {id:'756', name:'Actuarial 4 - Fondos y Jub.',   prereqs:['754']},
-      {id:'757', name:'Actuarial 3 - Equilibrio Act.', prereqs:['754','755']},
-      {id:'717', name:'Modelos y Proyecciones Act.',    prereqs:['757','758','746']},
-      {id:'728', name:'Practica Profesional Act.',      prereqs:['754','755','756']},
-      {id:'OPT1',name:'Optativa 1',                    prereqs:['CBC'], isOpt:true},
-      {id:'OPT2',name:'Optativa 2',                    prereqs:['CBC'], isOpt:true}
+      {id:'540', name:'Analisis Estadistico I',          prereqs:['CBC']},
+      {id:'542', name:'Matematica Aplicada I',            prereqs:['CBC']},
+      {id:'262', name:'Macroeconomia',                    prereqs:['CBC']},
+      {id:'274', name:'Sistemas Administrativos',         prereqs:['CBC']},
+      {id:'462', name:'Derecho Empresarial',              prereqs:['CBC']},
+      {id:'602', name:'Analisis Estadistico II',          prereqs:['540','542']},
+      {id:'544', name:'Matematica Aplicada II',           prereqs:['542']},
+      {id:'291', name:'Microeconomia',                    prereqs:['542']},
+      {id:'601', name:'Matematica Fin. y Actuarial',      prereqs:['540','542']},
+      {id:'746', name:'Computacion Cientifica Act.',      prereqs:['540','542']},
+      {id:'279', name:'Administracion Financiera',        prereqs:['601']},
+      {id:'603', name:'Der. Fin., Seguros y Seg. Soc.',  prereqs:['462']},
+      {id:'752', name:'Analisis Numerico',                prereqs:['544']},
+      {id:'751', name:'Estadistica Actuarial',            prereqs:['544','602']},
+      {id:'548', name:'Dinero y Bancos',                  prereqs:['279','602']},
+      {id:'753', name:'Biometria Actuarial',              prereqs:['601','751','752']},
+      {id:'755', name:'Actuarial 2 - Seg. Patrimoniales', prereqs:['601','751','752']},
+      {id:'758', name:'Actuarial 5 - Inv. y Financ.',    prereqs:['601','751']},
+      {id:'754', name:'Actuarial 1 - Seg. Personales',   prereqs:['753']},
+      {id:'756', name:'Actuarial 4 - Fondos y Jub.',     prereqs:['754']},
+      {id:'757', name:'Actuarial 3 - Equilibrio Act.',   prereqs:['754','755']},
+      {id:'717', name:'Modelos y Proyecciones Act.',      prereqs:['757','758','746']},
+      {id:'728', name:'Practica Profesional Act.',        prereqs:['754','755','756']},
+      {id:'OPT1',name:'Optativa 1',                      prereqs:['CBC'], isOpt:true},
+      {id:'OPT2',name:'Optativa 2',                      prereqs:['CBC'], isOpt:true}
     ]
   },
   contador: {
     label: 'Contador Publico', cbcLabel: 'Ciclo General',
     courses: [
-      {id:'247', name:'Teoria Contable',               prereqs:['CBC']},
-      {id:'248', name:'Estadistica I',                 prereqs:['CBC']},
-      {id:'249', name:'Hist. Econ. y Soc. Argentina',  prereqs:['CBC']},
-      {id:'250', name:'Microeconomia I',               prereqs:['CBC']},
-      {id:'251', name:'Inst. de Derecho Publico',      prereqs:['CBC']},
-      {id:'252', name:'Administracion General',        prereqs:['CBC']},
-      {id:'1359',name:'Derecho Economico',             prereqs:[]},
-      {id:'278', name:'Macroeconomia y Pol. Econ.',    prereqs:[]},
-      {id:'273', name:'Inst. de Derecho Privado',      prereqs:['1359']},
-      {id:'274', name:'Sistemas Administrativos',      prereqs:['252']},
-      {id:'276', name:'Calculo Financiero',            prereqs:['248']},
-      {id:'351', name:'Sistemas Contables',            prereqs:['247']},
-      {id:'353', name:'Sistemas de Costos',            prereqs:['247']},
-      {id:'354', name:'Der. Trabajo y Seg. Social',    prereqs:['251','1359']},
-      {id:'275', name:'Tecnologia de la Informacion',  prereqs:['274']},
-      {id:'279', name:'Administracion Financiera',     prereqs:['276']},
-      {id:'362', name:'Gestion y Costos p/Contadores', prereqs:['353']},
-      {id:'1352',name:'Contabilidad Financiera',       prereqs:['351','353']},
-      {id:'1374',name:'Contabilidad Gubernamental',    prereqs:['278','1352']},
-      {id:'1330',name:'Contabilidad Social y Ambiental',prereqs:['1352']},
-      {id:'356', name:'Teo. y Tec. Impositiva I',      prereqs:['251','1352']},
-      {id:'357', name:'Teo. y Tec. Impositiva II',     prereqs:['356']},
-      {id:'355', name:'Auditoria',                     prereqs:['362','1352']},
-      {id:'1360',name:'Der. Crediticio e Insolvencia', prereqs:['273','354']},
-      {id:'1358',name:'Taller Actuacion Judicial',     prereqs:['355','1360']},
-      {id:'1361',name:'Taller Practica Profesional',   prereqs:['273','279','355','1330']},
-      {id:'OPT1',name:'Electiva / Optativa',           prereqs:['CBC'], isOpt:true}
+      {id:'247', name:'Teoria Contable',                  prereqs:['CBC']},
+      {id:'248', name:'Estadistica I',                    prereqs:['CBC']},
+      {id:'249', name:'Hist. Econ. y Soc. Argentina',    prereqs:['CBC']},
+      {id:'250', name:'Microeconomia I',                  prereqs:['CBC']},
+      {id:'251', name:'Inst. de Derecho Publico',         prereqs:['CBC']},
+      {id:'252', name:'Administracion General',           prereqs:['CBC']},
+      {id:'1359',name:'Derecho Economico',                prereqs:[]},
+      {id:'278', name:'Macroeconomia y Pol. Econ.',       prereqs:[]},
+      {id:'273', name:'Inst. de Derecho Privado',         prereqs:['1359']},
+      {id:'274', name:'Sistemas Administrativos',         prereqs:['252']},
+      {id:'276', name:'Calculo Financiero',               prereqs:['248']},
+      {id:'351', name:'Sistemas Contables',               prereqs:['247']},
+      {id:'353', name:'Sistemas de Costos',               prereqs:['247']},
+      {id:'354', name:'Der. Trabajo y Seg. Social',       prereqs:['251','1359']},
+      {id:'275', name:'Tecnologia de la Informacion',     prereqs:['274']},
+      {id:'279', name:'Administracion Financiera',        prereqs:['276']},
+      {id:'362', name:'Gestion y Costos p/Contadores',    prereqs:['353']},
+      {id:'1352',name:'Contabilidad Financiera',          prereqs:['351','353']},
+      {id:'1374',name:'Contabilidad Gubernamental',       prereqs:['278','1352']},
+      {id:'1330',name:'Contabilidad Social y Ambiental',  prereqs:['1352']},
+      {id:'356', name:'Teo. y Tec. Impositiva I',         prereqs:['251','1352']},
+      {id:'357', name:'Teo. y Tec. Impositiva II',        prereqs:['356']},
+      {id:'355', name:'Auditoria',                        prereqs:['362','1352']},
+      {id:'1360',name:'Der. Crediticio e Insolvencia',    prereqs:['273','354']},
+      {id:'1358',name:'Taller Actuacion Judicial',        prereqs:['355','1360']},
+      {id:'1361',name:'Taller Practica Profesional',      prereqs:['273','279','355','1330']},
+      {id:'OPT1',name:'Electiva / Optativa',              prereqs:['CBC'], isOpt:true}
     ]
   },
   administracion: {
     label: 'Lic. en Administracion', cbcLabel: 'Ciclo General',
     courses: [
-      {id:'247', name:'Teoria Contable',               prereqs:['CBC']},
-      {id:'248', name:'Estadistica I',                 prereqs:['CBC']},
-      {id:'250', name:'Microeconomia I',               prereqs:['CBC']},
-      {id:'274', name:'Sistemas Administrativos',      prereqs:['CBC']},
-      {id:'276', name:'Calculo Financiero',            prereqs:['CBC']},
-      {id:'462', name:'Derecho Empresarial',           prereqs:['CBC']},
-      {id:'463', name:'Gestion de Tecnologias Digit.', prereqs:['CBC']},
-      {id:'467', name:'Gestion del Talento',           prereqs:['CBC']},
-      {id:'278', name:'Macroeconomia y Pol. Econ.',    prereqs:['250']},
-      {id:'279', name:'Administracion Financiera',     prereqs:['276']},
-      {id:'464', name:'Gestion de Costos',             prereqs:['247']},
-      {id:'465', name:'Metodos Predictivos p/Gestion', prereqs:['248']},
-      {id:'466', name:'Administracion de Operaciones', prereqs:['274']},
-      {id:'468', name:'Administracion Tributaria',     prereqs:['278']},
-      {id:'469', name:'Marketing',                     prereqs:['466']},
-      {id:'470', name:'Ciencias de la Decision',       prereqs:['465']},
-      {id:'471', name:'Planeamiento Estrategico',      prereqs:['279']},
-      {id:'472', name:'Direccion',                     prereqs:['467','470']},
-      {id:'473', name:'Practica Profesional',          prereqs:['471','472']},
-      {id:'OPT1',name:'Orientacion 1',                prereqs:['CBC'], isOpt:true},
-      {id:'OPT2',name:'Orientacion 2',                prereqs:['CBC'], isOpt:true},
-      {id:'OPT3',name:'Competencia',                  prereqs:['CBC'], isOpt:true}
+      {id:'247', name:'Teoria Contable',                  prereqs:['CBC']},
+      {id:'248', name:'Estadistica I',                    prereqs:['CBC']},
+      {id:'250', name:'Microeconomia I',                  prereqs:['CBC']},
+      {id:'274', name:'Sistemas Administrativos',         prereqs:['CBC']},
+      {id:'276', name:'Calculo Financiero',               prereqs:['CBC']},
+      {id:'462', name:'Derecho Empresarial',              prereqs:['CBC']},
+      {id:'463', name:'Gestion de Tecnologias Digit.',    prereqs:['CBC']},
+      {id:'467', name:'Gestion del Talento',              prereqs:['CBC']},
+      {id:'278', name:'Macroeconomia y Pol. Econ.',       prereqs:['250']},
+      {id:'279', name:'Administracion Financiera',        prereqs:['276']},
+      {id:'464', name:'Gestion de Costos',                prereqs:['247']},
+      {id:'465', name:'Metodos Predictivos p/Gestion',    prereqs:['248']},
+      {id:'466', name:'Administracion de Operaciones',    prereqs:['274']},
+      {id:'468', name:'Administracion Tributaria',        prereqs:['278']},
+      {id:'469', name:'Marketing',                        prereqs:['466']},
+      {id:'470', name:'Ciencias de la Decision',          prereqs:['465']},
+      {id:'471', name:'Planeamiento Estrategico',         prereqs:['279']},
+      {id:'472', name:'Direccion',                        prereqs:['467','470']},
+      {id:'473', name:'Practica Profesional',             prereqs:['471','472']},
+      {id:'OPT1',name:'Orientacion 1',                   prereqs:['CBC'], isOpt:true},
+      {id:'OPT2',name:'Orientacion 2',                   prereqs:['CBC'], isOpt:true},
+      {id:'OPT3',name:'Competencia',                     prereqs:['CBC'], isOpt:true}
     ]
   },
   economia: {
     label: 'Lic. en Economia', cbcLabel: 'Ciclo General',
     courses: [
-      {id:'262', name:'Macroeconomia I',               prereqs:['CBC']},
-      {id:'540', name:'Analisis Estadistico I',        prereqs:['CBC']},
-      {id:'541', name:'Hist. de la Economia Argentina',prereqs:['CBC']},
-      {id:'542', name:'Matematica Aplicada I',         prereqs:['CBC']},
-      {id:'544', name:'Matematica Aplicada II',        prereqs:['542']},
-      {id:'291', name:'Microeconomia p/Economistas',   prereqs:['542']},
-      {id:'543', name:'Econometria I',                 prereqs:['540','544']},
-      {id:'283', name:'Macroeconomia II',              prereqs:['262','544']},
-      {id:'286', name:'Microeconomia II',              prereqs:['291','544']},
-      {id:'545', name:'Epistemologia e Hist. Pens. Ec.',prereqs:['262','291']},
-      {id:'546', name:'Econometria II',                prereqs:['543']},
-      {id:'549', name:'Economia Financiera',           prereqs:['262','291']},
-      {id:'556', name:'Finanzas Publicas',             prereqs:['291']},
-      {id:'554', name:'Crecimiento Economico',         prereqs:['283','291']},
-      {id:'555', name:'Organizacion Industrial',       prereqs:['286']},
-      {id:'558', name:'Economia Internacional',        prereqs:['262','286']},
-      {id:'559', name:'Desarrollo Economico',          prereqs:['262','291','543']},
-      {id:'547', name:'Estructura y Pol. Economicas',  prereqs:['262','541','543','556']},
-      {id:'548', name:'Dinero y Bancos',               prereqs:['283','546','549']},
-      {id:'OPT1',name:'Orientacion 1',                prereqs:['CBC'], isOpt:true},
-      {id:'OPT2',name:'Orientacion 2',                prereqs:['CBC'], isOpt:true},
-      {id:'OPT3',name:'Orientacion 3',                prereqs:['CBC'], isOpt:true},
-      {id:'OPT4',name:'Orientacion 4',                prereqs:['CBC'], isOpt:true}
+      {id:'262', name:'Macroeconomia I',                  prereqs:['CBC']},
+      {id:'540', name:'Analisis Estadistico I',           prereqs:['CBC']},
+      {id:'541', name:'Hist. de la Economia Argentina',   prereqs:['CBC']},
+      {id:'542', name:'Matematica Aplicada I',            prereqs:['CBC']},
+      {id:'544', name:'Matematica Aplicada II',           prereqs:['542']},
+      {id:'291', name:'Microeconomia p/Economistas',      prereqs:['542']},
+      {id:'543', name:'Econometria I',                    prereqs:['540','544']},
+      {id:'283', name:'Macroeconomia II',                 prereqs:['262','544']},
+      {id:'286', name:'Microeconomia II',                 prereqs:['291','544']},
+      {id:'545', name:'Epistemologia e Hist. Pens. Ec.',  prereqs:['262','291']},
+      {id:'546', name:'Econometria II',                   prereqs:['543']},
+      {id:'549', name:'Economia Financiera',              prereqs:['262','291']},
+      {id:'556', name:'Finanzas Publicas',                prereqs:['291']},
+      {id:'554', name:'Crecimiento Economico',            prereqs:['283','291']},
+      {id:'555', name:'Organizacion Industrial',          prereqs:['286']},
+      {id:'558', name:'Economia Internacional',           prereqs:['262','286']},
+      {id:'559', name:'Desarrollo Economico',             prereqs:['262','291','543']},
+      {id:'547', name:'Estructura y Pol. Economicas',     prereqs:['262','541','543','556']},
+      {id:'548', name:'Dinero y Bancos',                  prereqs:['283','546','549']},
+      {id:'OPT1',name:'Orientacion 1',                   prereqs:['CBC'], isOpt:true},
+      {id:'OPT2',name:'Orientacion 2',                   prereqs:['CBC'], isOpt:true},
+      {id:'OPT3',name:'Orientacion 3',                   prereqs:['CBC'], isOpt:true},
+      {id:'OPT4',name:'Orientacion 4',                   prereqs:['CBC'], isOpt:true}
     ]
   }
 };
 
+// ============================
+// STATE
+// ============================
 var CBC_WEIGHT=6, isMob=window.innerWidth<=768;
 var NW=isMob?148:186, NH=isMob?60:68, XS=isMob?170:210, YS=isMob?76:84;
 var NFZ=isMob?10:11, BFZ=isMob?9:10;
-var currentCareer=null, cbcState=true, showOpt=true, cy=null, modalId=null;
+var currentCareer=null, showOpt=true, cy=null, modalId=null;
 var courseState={}, descMap={};
 
 function lsGet(k){ try{return JSON.parse(localStorage.getItem('fc_'+k)||'null');}catch(e){return null;} }
 function lsSet(k,v){ try{localStorage.setItem('fc_'+k,JSON.stringify(v));}catch(e){} }
 
+function getCBCState(){
+  if(!currentCareer) return false;
+  return CBC_COURSES[currentCareer].every(function(c){
+    return courseState[c.id]&&courseState[c.id].approved;
+  });
+}
+
+// ============================
+// LEVELS & GRAPH
+// ============================
 function computeLevels(courses){
-  var memo={}, stk={};
+  var memo={},stk={};
   function lv(id){
     if(id==='CBC') return -1;
     if(memo[id]!==undefined) return memo[id];
@@ -298,7 +407,7 @@ function computeLevels(courses){
     var real=(c.prereqs||[]).filter(function(p){return p!=='CBC';});
     if(!real.length){memo[id]=0;stk[id]=false;return 0;}
     var max=Math.max.apply(null,real.map(function(p){return Math.max(0,lv(p));}));
-    memo[id]=max+1; stk[id]=false; return memo[id];
+    memo[id]=max+1;stk[id]=false;return memo[id];
   }
   courses.forEach(function(c){lv(c.id);});
   return memo;
@@ -312,7 +421,7 @@ function buildDescMap(courses){
     while(q.length){
       var cur=q.shift();
       courses.forEach(function(x){
-        if((x.prereqs||[]).indexOf(cur)>=0 && !vis[x.id]){vis[x.id]=true;q.push(x.id);}
+        if((x.prereqs||[]).indexOf(cur)>=0&&!vis[x.id]){vis[x.id]=true;q.push(x.id);}
       });
     }
     map[c.id]=Object.keys(vis).length-1;
@@ -324,7 +433,7 @@ function buildElements(key){
   var courses=CAREERS[key].courses;
   var levels=computeLevels(courses);
   var maxLv=0;
-  courses.forEach(function(c){if(!c.isOpt&&levels[c.id]>maxLv)maxLv=levels[c.id];});
+  courses.forEach(function(c){if(!c.isOpt&&(levels[c.id]||0)>maxLv)maxLv=levels[c.id]||0;});
   var byCol={};
   courses.forEach(function(c){
     var col=c.isOpt?maxLv+1:(levels[c.id]||0);
@@ -334,9 +443,7 @@ function buildElements(key){
   var pos={};
   Object.keys(byCol).forEach(function(col){
     var arr=byCol[col];
-    arr.forEach(function(c,i){
-      pos[c.id]={x:+col*XS, y:(i-(arr.length-1)/2)*YS};
-    });
+    arr.forEach(function(c,i){pos[c.id]={x:+col*XS,y:(i-(arr.length-1)/2)*YS};});
   });
   var els=[];
   courses.forEach(function(c){
@@ -358,6 +465,7 @@ function getCyStyle(){
     {selector:'node.approved',style:{'background-color':'#0a2518','border-color':'#4ade80','border-width':2,color:'#a0e8c0'}},
     {selector:'node.avail',style:{'background-color':'#0a1a32','border-color':'#60a5fa','border-width':1.5,color:'#80b8f0'}},
     {selector:'node.locked',style:{'background-color':'#0b1220','border-color':'#1a2535','border-width':1,color:'#2a3850'}},
+    {selector:'node.failed',style:{'background-color':'#1a0808','border-color':'#f87171','border-width':1.5,color:'#f87171'}},
     {selector:'node.opt',style:{'border-style':'dashed'}},
     {selector:'node.hidden',style:{display:'none'}},
     {selector:'edge',style:{width:1,'line-color':'#1a2535','target-arrow-shape':'none','curve-style':'bezier',opacity:.45}},
@@ -368,14 +476,7 @@ function getCyStyle(){
 
 function initCy(key){
   if(cy){cy.destroy();cy=null;}
-  cy=cytoscape({
-    container:document.getElementById('cy'),
-    elements:buildElements(key),
-    layout:{name:'preset'},
-    minZoom:.06,maxZoom:4,
-    userZoomingEnabled:true,userPanningEnabled:true,
-    style:getCyStyle()
-  });
+  cy=cytoscape({container:document.getElementById('cy'),elements:buildElements(key),layout:{name:'preset'},minZoom:.06,maxZoom:4,userZoomingEnabled:true,userPanningEnabled:true,style:getCyStyle()});
   cy.on('tap','node',function(e){
     var id=e.target.id();
     if(id.indexOf('__bdg__')===0) openModal(id.slice(7));
@@ -384,8 +485,8 @@ function initCy(key){
   cy.on('position','node',function(e){
     var id=e.target.id();
     if(id.indexOf('__bdg__')===0) return;
-    var badge=cy.getElementById('__bdg__'+id);
-    if(badge.length){var np=e.target.position();badge.position({x:np.x+NW/2-7,y:np.y-NH/2+7});}
+    var b=cy.getElementById('__bdg__'+id);
+    if(b.length){var np=e.target.position();b.position({x:np.x+NW/2-7,y:np.y-NH/2+7});}
   });
   setTimeout(resetView,60);
   updateAll();
@@ -407,12 +508,9 @@ function rebuildBadges(){
   var courses=CAREERS[currentCareer].courses;
   courses.forEach(function(c){
     if(!showOpt&&c.isOpt) return;
-    var cnt=descMap[c.id]||0;
-    if(cnt<=0) return;
-    var node=cy.getElementById(c.id);
-    if(!node.length) return;
-    var np=node.position();
-    var bid='__bdg__'+c.id;
+    var cnt=descMap[c.id]||0;if(cnt<=0) return;
+    var node=cy.getElementById(c.id);if(!node.length) return;
+    var np=node.position(),bid='__bdg__'+c.id;
     cy.add({group:'nodes',classes:'badge',data:{id:bid,label:String(cnt)},position:{x:np.x+NW/2-7,y:np.y-NH/2+7}});
     cy.getElementById(bid).on('tap',function(e){e.stopPropagation();openModal(c.id);});
   });
@@ -426,11 +524,20 @@ function nearGrad(courses){
 function isAvail(course,courses){
   if(courseState[course.id]&&courseState[course.id].approved) return false;
   if(nearGrad(courses)) return true;
+  var cbc=getCBCState();
   for(var i=0;i<(course.prereqs||[]).length;i++){
     var p=course.prereqs[i];
-    if(p==='CBC'){if(!cbcState)return false;}
+    if(p==='CBC'){if(!cbc)return false;}
     else{if(!courseState[p]||!courseState[p].approved)return false;}
   }
+  return true;
+}
+
+// A course is "failed" if it has attempts but none passed (all grades < 4)
+function hasFailed(id){
+  var st=courseState[id];
+  if(!st||!st.history||!st.history.length) return false;
+  if(st.approved) return false;
   return true;
 }
 
@@ -438,58 +545,78 @@ function updateAll(){
   if(!cy||!currentCareer) return;
   var courses=CAREERS[currentCareer].courses;
   var ng=nearGrad(courses);
+  var cbc=getCBCState();
+
   courses.forEach(function(c){
-    var node=cy.getElementById(c.id);
-    if(!node.length) return;
-    var approved=!!(courseState[c.id]&&courseState[c.id].approved);
+    var node=cy.getElementById(c.id);if(!node.length) return;
+    var st=courseState[c.id]||{};
+    var approved=!!st.approved;
     var avail=isAvail(c,courses);
-    var g=courseState[c.id]?courseState[c.id].grade:null;
-    node.data('label',(approved&&g!=null)?c.name+'\n['+g+']':c.name);
-    node.removeClass('approved avail locked opt hidden');
+    var failed=hasFailed(c.id);
+    var g=st.grade;
+    node.data('label',(approved&&g!=null)?c.name+'\n['+g+']':(failed?c.name+'\n[desap.]':c.name));
+    node.removeClass('approved avail locked opt hidden failed');
     if(!showOpt&&c.isOpt){node.addClass('hidden');return;}
     if(c.isOpt) node.addClass('opt');
     if(approved) node.addClass('approved');
+    else if(failed) node.addClass('failed');
     else if(avail) node.addClass('avail');
     else node.addClass('locked');
   });
+
   cy.edges().forEach(function(e){
     var s=cy.getElementById(e.data('source')),t=cy.getElementById(e.data('target'));
     if(s.hasClass('hidden')||t.hasClass('hidden')) e.addClass('hidden');
     else e.removeClass('hidden');
   });
   rebuildBadges();
+
+  // Stats: include CBC course grades
+  var cbcCourses=CBC_COURSES[currentCareer]||[];
+  var cbcDoneCount=cbcCourses.filter(function(c){return courseState[c.id]&&courseState[c.id].approved;}).length;
   var total=courses.length+CBC_WEIGHT;
-  var done=cbcState?CBC_WEIGHT:0,gSum=0,gCnt=0;
+  var done=cbcDoneCount, gSum=0, gCnt=0;
+
+  // CBC grades (only approved)
+  cbcCourses.forEach(function(c){
+    if(courseState[c.id]&&courseState[c.id].approved){
+      var g=courseState[c.id].grade;
+      if(g!=null&&+g>=4){gSum+=+g;gCnt++;}
+    }
+  });
+  // Career grades (only approved, last passing grade)
   courses.forEach(function(c){
     if(courseState[c.id]&&courseState[c.id].approved){
       done++;
       var g=courseState[c.id].grade;
-      if(g!=null&&+g>0){gSum+=+g;gCnt++;}
+      if(g!=null&&+g>=4){gSum+=+g;gCnt++;}
     }
   });
+
   var pct=Math.round(done/total*100);
   var avg=gCnt>0?(gSum/gCnt).toFixed(2):'-';
   var cd=courses.filter(function(c){return courseState[c.id]&&courseState[c.id].approved;}).length;
+
   document.getElementById('prog-bar').style.width=pct+'%';
   document.getElementById('prog-txt').textContent=pct+'% completado';
   document.getElementById('bpct').textContent=pct+'%';
   document.getElementById('bavg').textContent=avg;
-  document.getElementById('bdone').textContent=cd;
-  document.getElementById('btotal').textContent=courses.length;
+  document.getElementById('bdone').textContent=cd+'+'+cbcDoneCount;
+  document.getElementById('btotal').textContent=courses.length+'+'+CBC_WEIGHT;
   var cb=document.getElementById('cbc-btn');
-  cb.textContent=(cbcState?'ok ':'')+CAREERS[currentCareer].cbcLabel;
-  cb.className=cbcState?'done':'';
+  cb.textContent=(cbc?'✓ ':'')+CAREERS[currentCareer].cbcLabel+' ('+cbcDoneCount+'/6)';
+  cb.className=cbc?'done':'';
   document.getElementById('near-info').className=ng?'on':'';
 }
 
+// ============================
+// CAREER SELECTION
+// ============================
 function selectCareer(key){
   var leg=document.getElementById('legajo-input').value.trim();
   if(leg) lsSet('legajo',leg);
   currentCareer=key; lsSet('career',key);
-  var st=lsGet('state_'+key);
-  courseState=st||{};
-  var cbcSt=lsGet('cbc_'+key);
-  cbcState=(cbcSt===null?true:cbcSt);
+  var st=lsGet('state_'+key); courseState=st||{};
   showOpt=true;
   document.getElementById('opt-btn').textContent='Ocultar optativas';
   document.getElementById('selector').style.display='none';
@@ -507,9 +634,63 @@ function showSelector(){
   var l=lsGet('legajo');if(l) document.getElementById('legajo-input').value=l;
 }
 
-function toggleCBC(){ cbcState=!cbcState; lsSet('cbc_'+currentCareer,cbcState); updateAll(); }
-function toggleOpt(){ showOpt=!showOpt; document.getElementById('opt-btn').textContent=showOpt?'Ocultar optativas':'Mostrar optativas'; updateAll(); }
+function toggleOpt(){
+  showOpt=!showOpt;
+  document.getElementById('opt-btn').textContent=showOpt?'Ocultar optativas':'Mostrar optativas';
+  updateAll();
+}
 
+// ============================
+// CBC MODAL
+// ============================
+function openCBCModal(){
+  if(!currentCareer) return;
+  var cbcCourses=CBC_COURSES[currentCareer];
+  var career=CAREERS[currentCareer];
+  document.getElementById('cbc-title').textContent=career.cbcLabel+' — 6 materias';
+  document.getElementById('cbc-sub').textContent='Marca cada materia y su nota. Solo las aprobadas (>=4) cuentan en el promedio.';
+  var list=document.getElementById('cbc-list'); list.innerHTML='';
+  cbcCourses.forEach(function(c){
+    var st=courseState[c.id]||{};
+    var row=document.createElement('div');row.className='cbc-row';
+    var chk=document.createElement('input');chk.type='checkbox';chk.className='cbc-check';
+    chk.id='cbcchk_'+c.id;chk.checked=!!(st.approved);
+    var lbl=document.createElement('label');lbl.className='cbc-name';lbl.htmlFor='cbcchk_'+c.id;
+    lbl.textContent=c.name;
+    var gi=document.createElement('input');gi.type='number';gi.className='cbc-g';
+    gi.id='cbcg_'+c.id;gi.min=1;gi.max=10;gi.step=0.5;gi.placeholder='-';
+    if(st.grade!=null) gi.value=st.grade;
+    row.appendChild(chk);row.appendChild(lbl);row.appendChild(gi);
+    list.appendChild(row);
+  });
+  document.getElementById('cbc-overlay').classList.remove('hidden');
+}
+
+function saveCBC(){
+  if(!currentCareer) return;
+  var cbcCourses=CBC_COURSES[currentCareer];
+  cbcCourses.forEach(function(c){
+    var chk=document.getElementById('cbcchk_'+c.id);
+    var gi=document.getElementById('cbcg_'+c.id);
+    var approved=chk&&chk.checked;
+    var raw=gi?parseFloat(gi.value):NaN;
+    var grade=(!isNaN(raw)&&raw>=1&&raw<=10)?raw:null;
+    var st=courseState[c.id]||{approved:false,grade:null,history:[]};
+    var hist=(st.history||[]).slice();
+    if(grade!=null&&grade!==st.grade) hist.push(grade);
+    courseState[c.id]={approved:approved&&grade!=null&&grade>=4,grade:(approved&&grade>=4)?grade:null,history:hist};
+  });
+  lsSet('state_'+currentCareer,courseState);
+  closeCBCModal();
+  updateAll();
+}
+
+function closeCBCModal(){document.getElementById('cbc-overlay').classList.add('hidden');}
+document.getElementById('cbc-overlay').addEventListener('click',function(e){if(e.target.id==='cbc-overlay')closeCBCModal();});
+
+// ============================
+// COURSE MODAL
+// ============================
 function openModal(courseId){
   if(!currentCareer) return;
   var courses=CAREERS[currentCareer].courses;
@@ -517,61 +698,104 @@ function openModal(courseId){
   if(!course) return;
   modalId=courseId;
   var st=courseState[courseId]||{};
-  var approved=!!st.approved, grade=st.grade!=null?st.grade:null, history=st.history||[];
+  var approved=!!st.approved, history=st.history||[];
+  var grade=st.grade;
+
   document.getElementById('mcode').textContent='Codigo: '+courseId;
   document.getElementById('mname').textContent=course.name;
+
+  // Status
   var stEl=document.getElementById('mstatus');
+  stEl.className='mstatus';
   if(approved){
-    stEl.style.cssText='font-size:12px;padding:7px 10px 7px 12px;border-radius:8px;background:#071a10;border-left:3px solid #4ade80;margin-bottom:14px;color:#4ade80;';
-    stEl.textContent='Aprobada'+(grade!=null?' con nota '+grade:'');
+    stEl.classList.add('status-approved');
+    stEl.textContent='Aprobada'+(grade!=null?' — nota: '+grade:'');
+  } else if(history.length>0){
+    stEl.classList.add('status-avail');
+    stEl.style.borderLeftColor='#f87171';
+    stEl.style.background='#1a0808';
+    stEl.style.color='#f87171';
+    var lastFail=history[history.length-1];
+    stEl.textContent='Desaprobada — ultima nota: '+lastFail+'. Podes recursar.';
   } else if(isAvail(course,courses)){
-    stEl.style.cssText='font-size:12px;padding:7px 10px 7px 12px;border-radius:8px;background:#071828;border-left:3px solid #60a5fa;margin-bottom:14px;color:#60a5fa;';
+    stEl.classList.add('status-avail');
     stEl.textContent='Disponible para cursar';
   } else {
-    stEl.style.cssText='font-size:12px;padding:7px 10px 7px 12px;border-radius:8px;background:#0d1628;border-left:3px solid #1a2535;margin-bottom:14px;color:#3a5070;';
+    stEl.classList.add('status-locked');
+    var cbc=getCBCState();
     var miss=(course.prereqs||[]).filter(function(p){
-      if(p==='CBC') return !cbcState;
+      if(p==='CBC') return !cbc;
       return !courseState[p]||!courseState[p].approved;
     }).map(function(p){
       if(p==='CBC') return CAREERS[currentCareer].cbcLabel;
-      var c2=courses.find(function(x){return x.id===p;});
-      return c2?c2.name:p;
+      var c2=courses.find(function(x){return x.id===p;});return c2?c2.name:p;
     });
-    stEl.textContent='Bloqueada - falta: '+(miss.join(', ')||'?');
+    stEl.textContent='Bloqueada — falta: '+(miss.join(', ')||'?');
   }
-  document.getElementById('mgrade').value=grade!=null?grade:'';
-  var ab=document.getElementById('mapprove');
-  ab.style.opacity='1'; ab.className='';
-  if(approved){ab.classList.add('approved');ab.textContent='Aprobada (editar nota)';}
-  else if(isAvail(course,courses)){ab.classList.add('avail');ab.textContent='Marcar como aprobada';}
-  else{ab.textContent='Marcar como aprobada';ab.style.opacity='.5';}
-  document.getElementById('munapprove').style.display=approved?'block':'none';
-  var hEl=document.getElementById('mhist'); hEl.innerHTML='';
-  if(!history.length){
-    var li=document.createElement('li');li.textContent='Sin historial';li.style.color='#1a2535';hEl.appendChild(li);
-  } else {
+
+  // History
+  var histSec=document.getElementById('hist-sec');
+  var hEl=document.getElementById('mhist');hEl.innerHTML='';
+  if(history.length){
+    histSec.style.display='block';
     history.forEach(function(g,i){
       var li=document.createElement('li');
+      var pass=+g>=4;
       var last=i===history.length-1;
-      var gs=document.createElement('span');
-      gs.innerHTML='Intento '+(i+1)+': <strong style="color:'+(last?'#4ade80':'#607090')+'">'+g+'</strong>';
-      var ns=document.createElement('span');ns.className='mnote';ns.textContent=last?'promedio':'';
-      li.appendChild(gs);li.appendChild(ns);hEl.appendChild(li);
+      var leftSpan=document.createElement('span');
+      leftSpan.textContent='Cursada '+(i+1)+': ';
+      var badge=document.createElement('span');
+      badge.className='grade-badge '+(pass?'grade-pass':'grade-fail');
+      badge.textContent=g;
+      leftSpan.appendChild(badge);
+      var rightSpan=document.createElement('span');rightSpan.className='mnote';
+      if(last&&pass) rightSpan.textContent='← promedio';
+      else if(last&&!pass) rightSpan.textContent='← desaprobada';
+      li.appendChild(leftSpan);li.appendChild(rightSpan);
+      hEl.appendChild(li);
     });
+  } else {
+    histSec.style.display='none';
   }
+
+  // Register section: show if approved OR available OR already has attempts (desaprobada)
+  var regSec=document.getElementById('register-sec');
+  var lbl=document.getElementById('register-lbl');
+  if(approved||history.length>0||isAvail(course,courses)){
+    regSec.style.display='block';
+    document.getElementById('mgrade').value='';
+    if(approved){
+      lbl.textContent='Recursar (registrar nueva cursada):';
+      lbl.style.color='#ca8a04';
+    } else if(history.length>0){
+      lbl.textContent='Recursar (nuevo intento):';
+      lbl.style.color='#ca8a04';
+    } else {
+      lbl.textContent='Registrar cursada:';
+      lbl.style.color='#2a3850';
+    }
+  } else {
+    regSec.style.display='none';
+  }
+
+  document.getElementById('munapprove').style.display=approved?'block':'none';
   document.getElementById('moverlay').classList.remove('hidden');
 }
 
-function doApprove(){
+function doRegistrar(){
   if(!modalId||!currentCareer) return;
   var raw=parseFloat(document.getElementById('mgrade').value);
-  var grade=(!isNaN(raw)&&raw>=4&&raw<=10)?raw:null;
+  if(isNaN(raw)||raw<1||raw>10){alert('Ingresa una nota entre 1 y 10');return;}
   var st=courseState[modalId]||{approved:false,grade:null,history:[]};
   var hist=(st.history||[]).slice();
-  if(grade!=null) hist.push(grade);
-  courseState[modalId]={approved:true,grade:grade,history:hist};
+  hist.push(raw);
+  var pass=raw>=4;
+  // Find last passing grade (the current grade for promedio)
+  var lastPass=null;
+  for(var i=hist.length-1;i>=0;i--){if(+hist[i]>=4){lastPass=+hist[i];break;}}
+  courseState[modalId]={approved:pass,grade:pass?raw:null,history:hist};
   lsSet('state_'+currentCareer,courseState);
-  closeModal(); updateAll();
+  closeModal();updateAll();
 }
 
 function doUnapprove(){
@@ -579,16 +803,18 @@ function doUnapprove(){
   var st=courseState[modalId]||{};
   courseState[modalId]={approved:false,grade:null,history:st.history||[]};
   lsSet('state_'+currentCareer,courseState);
-  closeModal(); updateAll();
+  closeModal();updateAll();
 }
 
-function closeModal(){ document.getElementById('moverlay').classList.add('hidden'); modalId=null; }
+function closeModal(){document.getElementById('moverlay').classList.add('hidden');modalId=null;}
 document.getElementById('moverlay').addEventListener('click',function(e){if(e.target.id==='moverlay')closeModal();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeCBCModal();}});
 
+// ============================
+// STARTUP
+// ============================
 window.addEventListener('load',function(){
-  var saved=lsGet('career');
-  var leg=lsGet('legajo');
+  var saved=lsGet('career'),leg=lsGet('legajo');
   if(leg) document.getElementById('legajo-input').value=leg;
   if(saved&&CAREERS[saved]) selectCareer(saved);
 });
