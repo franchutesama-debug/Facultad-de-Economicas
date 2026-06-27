@@ -14,7 +14,6 @@
       overflow: hidden; min-height: 100vh;
     }
 
-    /* ── Fondo matemático ──────────────────────────────────────────── */
     #math-bg {
       position: fixed; inset: 0;
       pointer-events: none; z-index: 0; overflow: hidden;
@@ -25,7 +24,6 @@
       color: #162033; user-select: none; pointer-events: none; line-height: 1;
     }
 
-    /* ── Header ────────────────────────────────────────────────────── */
     #header {
       position: relative; z-index: 2;
       padding: 8px 18px 5px;
@@ -40,7 +38,6 @@
       margin-bottom: 6px; font-weight: 600;
     }
 
-    /* Fila superior: progreso + CBC toggle */
     #top-row {
       display: flex; align-items: center; gap: 10px;
       margin-bottom: 5px;
@@ -61,7 +58,6 @@
       font-size: 10px; color: #3a5070; font-weight: 700; white-space: nowrap;
     }
 
-    /* CBC toggle */
     #cbc-btn {
       flex-shrink: 0;
       padding: 3px 11px 3px 8px;
@@ -77,7 +73,6 @@
     }
     #cbc-icon { font-size: 13px; line-height: 1; }
 
-    /* Leyenda */
     #legend {
       display: flex; justify-content: center;
       gap: 14px; font-size: 10px; flex-wrap: wrap;
@@ -89,12 +84,11 @@
 
     #hint { text-align: center; font-size: 9px; color: #1a2a3e; margin-top: 2px; }
 
-    /* ── Canvas ────────────────────────────────────────────────────── */
     #cy {
       position: relative; z-index: 1;
       width: 100%; height: calc(100vh - 96px);
       background: transparent;
-      touch-action: none;   /* el pellizco lo maneja Cytoscape, no el browser */
+      touch-action: none;
     }
 
     @media (max-width: 480px) {
@@ -131,7 +125,6 @@
 <div id="cy"></div>
 
 <script>
-// ── Fondo matemático ─────────────────────────────────────────────────────────
 const SYM = [
   '∫₀^∞','∑ᵢxᵢ','E[X]','Var(X)','σ²','f(x)dx','μ','λ','Φ(t)',
   'P(T>t)','äₓ','qₓ','pₓ','ₙpₓ','e^{-δt}','∂/∂t','lim_{n→∞}',
@@ -155,23 +148,17 @@ for (let i = 0; i < 62; i++) {
   bg.appendChild(el);
 }
 
-// ── Config ───────────────────────────────────────────────────────────────────
 const isMobile = window.innerWidth <= 768;
-const NW  = isMobile ? 158 : 200;   // node width
-const NH  = isMobile ? 70  : 80;    // node height
-const NFZ = isMobile ? 11  : 13;    // node font size
-const XS  = isMobile ? 182 : 240;   // x spacing
-const YS  = isMobile ? 88  : 98;    // y spacing
-const BS  = isMobile ? 22  : 24;    // badge size
-const BFZ = isMobile ? 10  : 11;    // badge font size
+const NW  = isMobile ? 158 : 200;
+const NH  = isMobile ? 70  : 80;
+const NFZ = isMobile ? 11  : 13;
+const XS  = isMobile ? 182 : 240;
+const YS  = isMobile ? 88  : 98;
+const BS  = isMobile ? 22  : 24;
+const BFZ = isMobile ? 10  : 11;
 
-// ── Materias ─────────────────────────────────────────────────────────────────
-// CBC vive en el estado pero NO es un nodo del grafo.
-// Las materias que antes dependían de las 6 del CBC ahora dependen de 'CBC' (el toggle).
 const courses = [
-  // CBC — solo estado, sin nodo en el grafo
   { id: 'CBC', noGraph: true },
-
   { id: '540', name: 'Análisis estadístico',                prerequisites: ['CBC'] },
   { id: '542', name: 'Matemática aplicada I',               prerequisites: ['CBC'] },
   { id: '262', name: 'Macroeconomía',                       prerequisites: ['CBC'] },
@@ -203,7 +190,6 @@ const graphCourses = courses.filter(c => !c.noGraph && !c.isOpt);
 const byId = {};
 courses.forEach(c => { byId[c.id] = c; });
 
-// ── Impacto ──────────────────────────────────────────────────────────────────
 const directDeps = {};
 courses.forEach(c => { directDeps[c.id] = []; });
 courses.forEach(c => (c.prerequisites || []).forEach(pr => { if (directDeps[pr]) directDeps[pr].push(c.id); }));
@@ -216,7 +202,6 @@ function descendants(id) {
 const impact = {};
 courses.forEach(c => { impact[c.id] = descendants(c.id).size; });
 
-// ── Niveles ──────────────────────────────────────────────────────────────────
 const lvlMap = {};
 function level(id) {
   if (lvlMap[id] !== undefined) return lvlMap[id];
@@ -226,7 +211,6 @@ function level(id) {
 }
 graphCourses.forEach(c => { c._lvl = level(c.id); });
 
-// Agrupar y ordenar
 const grouped = {};
 graphCourses.forEach(c => { (grouped[c._lvl] = grouped[c._lvl] || []).push(c); });
 Object.keys(grouped).forEach(l => {
@@ -234,24 +218,16 @@ Object.keys(grouped).forEach(l => {
   grouped[l].forEach((c,i) => { c._pos = { col: +l, row: i }; });
 });
 
-// El nivel mínimo de los nodos del grafo es 1 (CBC es nivel 0 pero no está en el grafo).
-// Desplazamos todo 1 columna a la izquierda para que arranquen en col 0.
-const colOffset = Math.min(...graphCourses.map(c => c._pos.col)); // = 1
-const maxCol    = Math.max(...graphCourses.map(c => c._pos.col)); // = 7 → desplazado a 6
+const colOffset = Math.min(...graphCourses.map(c => c._pos.col));
+const maxCol    = Math.max(...graphCourses.map(c => c._pos.col));
 const lastGroupSize = (grouped[maxCol] || []).length;
 
 function getPos(c) {
-  const col = c._pos.col - colOffset; // shift: empieza en 0
-  const row = c._pos.row;
-  return { x: col * XS + 80, y: row * YS + 50 };
+  return { x: (c._pos.col - colOffset) * XS + 80, y: c._pos.row * YS + 50 };
 }
-
-// OPT: misma columna que el maxCol desplazado
 const optX = (maxCol - colOffset) * XS + 80;
 
-// ── Elementos ────────────────────────────────────────────────────────────────
 const elements = [];
-
 graphCourses.forEach(c => {
   const pos = getPos(c);
   elements.push({ data: { id: c.id, label: c.id + '\n' + c.name, type: 'course' }, position: pos });
@@ -263,118 +239,56 @@ graphCourses.forEach(c => {
     });
   }
 });
-
-// Optativas al final
 [{ id:'OPT1', name:'Optativa 1' }, { id:'OPT2', name:'Optativa 2' }].forEach((opt, i) => {
-  const pos = { x: optX, y: (lastGroupSize + i) * YS + 50 };
-  elements.push({ data: { id: opt.id, label: opt.id+'\n'+opt.name, type: 'course' }, position: pos });
+  elements.push({ data: { id: opt.id, label: opt.id+'\n'+opt.name, type: 'course' }, position: { x: optX, y: (lastGroupSize + i) * YS + 50 } });
 });
 
-// ── Estado ───────────────────────────────────────────────────────────────────
 const state = {};
 courses.forEach(c => { state[c.id] = false; });
-state['CBC'] = true; // la mayoría ya tiene el CBC hecho
+state['CBC'] = true;
 
-const CBC_WEIGHT  = 6; // el CBC equivale a 6 materias en el progreso
-const totalUnits  = courses.length - 1 + CBC_WEIGHT; // reemplaza el peso 1 de CBC por 6
+const CBC_WEIGHT = 6;
+const totalUnits = courses.length - 1 + CBC_WEIGHT;
 
-// ── Cytoscape ────────────────────────────────────────────────────────────────
 const cy = cytoscape({
   container: document.getElementById('cy'),
   elements,
-  userZoomingEnabled:  true,
-  userPanningEnabled:  isMobile,
-  minZoom: 0.1,
-  maxZoom: 4,
+  userZoomingEnabled: true,
+  userPanningEnabled: isMobile,
+  minZoom: 0.1, maxZoom: 4,
   boxSelectionEnabled: false,
   style: [
-    {
-      selector: 'node[type="course"]',
-      style: {
-        shape: 'round-rectangle', width: NW, height: NH,
-        'background-color': '#0b1220',
-        'border-color': '#18243a', 'border-width': 1.5,
-        label: 'data(label)',
-        'text-wrap': 'wrap', 'text-max-width': NW - 12,
-        'text-valign': 'center', color: '#243048',
-        'font-size': NFZ, 'font-family': 'Segoe UI, Arial, sans-serif'
-      }
-    },
-    {
-      selector: '.completed',
-      style: {
-        'background-color': '#071810', 'border-color': '#4ade80', 'border-width': 2,
-        color: '#4ade80',
-        'shadow-blur': 14, 'shadow-color': '#22c55e',
-        'shadow-offset-x': 0, 'shadow-offset-y': 0, 'shadow-opacity': 0.38
-      }
-    },
-    {
-      selector: '.available',
-      style: {
-        'background-color': '#070f22', 'border-color': '#60a5fa', 'border-width': 2,
-        color: '#7dc3fb',
-        'shadow-blur': 16, 'shadow-color': '#3b82f6',
-        'shadow-offset-x': 0, 'shadow-offset-y': 0, 'shadow-opacity': 0.42
-      }
-    },
-    {
-      selector: '.locked',
-      style: {
-        'background-color': '#090f1c', 'border-color': '#121c2e', 'border-width': 1,
-        color: '#1a2535'
-      }
-    },
-    {
-      selector: '.badge',
-      style: {
-        shape: 'ellipse', width: BS, height: BS,
-        'background-color': '#ca8a04',
-        'border-width': 1.5, 'border-color': '#060a16',
-        label: 'data(label)',
-        color: '#000', 'font-size': BFZ, 'font-weight': 'bold',
-        'text-valign': 'center', 'text-halign': 'center', 'z-index': 999,
-        'shadow-blur': 8, 'shadow-color': '#fbbf24',
-        'shadow-offset-x': 0, 'shadow-offset-y': 0, 'shadow-opacity': 0.55
-      }
-    }
+    { selector: 'node[type="course"]', style: { shape: 'round-rectangle', width: NW, height: NH, 'background-color': '#0b1220', 'border-color': '#18243a', 'border-width': 1.5, label: 'data(label)', 'text-wrap': 'wrap', 'text-max-width': NW - 12, 'text-valign': 'center', color: '#243048', 'font-size': NFZ, 'font-family': 'Segoe UI, Arial, sans-serif' } },
+    { selector: '.completed', style: { 'background-color': '#071810', 'border-color': '#4ade80', 'border-width': 2, color: '#4ade80', 'shadow-blur': 14, 'shadow-color': '#22c55e', 'shadow-offset-x': 0, 'shadow-offset-y': 0, 'shadow-opacity': 0.38 } },
+    { selector: '.available', style: { 'background-color': '#070f22', 'border-color': '#60a5fa', 'border-width': 2, color: '#7dc3fb', 'shadow-blur': 16, 'shadow-color': '#3b82f6', 'shadow-offset-x': 0, 'shadow-offset-y': 0, 'shadow-opacity': 0.42 } },
+    { selector: '.locked',    style: { 'background-color': '#090f1c', 'border-color': '#121c2e', 'border-width': 1, color: '#1a2535' } },
+    { selector: '.badge',     style: { shape: 'ellipse', width: BS, height: BS, 'background-color': '#ca8a04', 'border-width': 1.5, 'border-color': '#060a16', label: 'data(label)', color: '#000', 'font-size': BFZ, 'font-weight': 'bold', 'text-valign': 'center', 'text-halign': 'center', 'z-index': 999, 'shadow-blur': 8, 'shadow-color': '#fbbf24', 'shadow-offset-x': 0, 'shadow-offset-y': 0, 'shadow-opacity': 0.55 } }
   ],
   layout: { name: 'preset' }
 });
 
 cy.nodes().ungrabify();
 
-// ── Vista inicial ────────────────────────────────────────────────────────────
 function applyView() {
-  const bb  = cy.elements().boundingBox();
-  const cw  = cy.width();
-  const ch  = cy.height();
-  const pad = 20;
-
+  const bb = cy.elements().boundingBox();
+  const cw = cy.width(), ch = cy.height(), pad = 20;
   if (isMobile) {
-    // Móvil: zoom para que los nodos se lean bien, arranca desde la izquierda
-    const z = Math.min((ch - pad*2) / bb.h, 0.88);
-    cy.zoom(Math.max(z, 0.3));
-    cy.pan({ x: pad - bb.x1 * cy.zoom(), y: pad - bb.y1 * cy.zoom() });
-  } else {
-    // Desktop: encaja todo en pantalla
-    const zoom = Math.min((cw - pad*2) / bb.w, (ch - pad*2) / bb.h, 3);
-    const z = Math.max(zoom, 0.05);
+    const z = Math.max(Math.min((ch - pad*2) / bb.h, 0.88), 0.3);
     cy.zoom(z);
-    cy.pan({
-      x: pad + (cw - pad*2 - bb.w * z) / 2 - bb.x1 * z,
-      y: pad - bb.y1 * z
-    });
+    cy.pan({ x: pad - bb.x1 * z, y: pad - bb.y1 * z });
+  } else {
+    const z = Math.max(Math.min((cw - pad*2) / bb.w, (ch - pad*2) / bb.h, 3), 0.05);
+    cy.zoom(z);
+    cy.pan({ x: pad + (cw - pad*2 - bb.w * z) / 2 - bb.x1 * z, y: pad - bb.y1 * z });
   }
 }
 applyView();
 window.addEventListener('resize', applyView);
 
-// ── Actualizar estados ───────────────────────────────────────────────────────
 function update() {
   let done = 0;
   courses.forEach(c => {
-    if (c.noGraph) { if (state[c.id]) done += CBC_WEIGHT; return; } // CBC pesa 6
+    if (c.noGraph) { if (state[c.id]) done += CBC_WEIGHT; return; }
     const n = cy.getElementById(c.id);
     if (!n || !n.length) { if (state[c.id]) done++; return; }
     n.removeClass('completed available locked');
@@ -387,7 +301,6 @@ function update() {
 }
 update();
 
-// ── CBC toggle ───────────────────────────────────────────────────────────────
 function toggleCBC() {
   state['CBC'] = !state['CBC'];
   const btn = document.getElementById('cbc-btn');
@@ -397,7 +310,6 @@ function toggleCBC() {
   update();
 }
 
-// ── Tap ──────────────────────────────────────────────────────────────────────
 cy.on('tap', 'node', evt => {
   let id = evt.target.id();
   if (evt.target.data('type') === 'badge') id = evt.target.data('forCourse');
